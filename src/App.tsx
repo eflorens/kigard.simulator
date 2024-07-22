@@ -1,14 +1,16 @@
-import React from 'react';
-import { Simulator } from './features/simulator/Simulator';
-import './App.css';
+import { Profile } from './features/profile/Profile';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.scss';
+import { Container } from 'reactstrap';
+import { Layout } from './components/Layout';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Simulator />
-      </header>
-    </div>
+    <Layout>
+      <Container>
+        <Profile />
+      </Container>
+    </Layout>
   );
 }
 

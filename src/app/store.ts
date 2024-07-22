@@ -1,9 +1,9 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import simulatorReducer from '../features/simulator/simulatorSlice';
+import profileReducer from '../features/profile/profileSlice';
 
 export const store = configureStore({
   reducer: {
-    simulator: simulatorReducer,
+    profile: profileReducer,
   },
 });
 

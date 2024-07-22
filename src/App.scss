@@ -1,0 +1,17 @@
+$colors: (
+  light: #f8f9fa,
+  dark: #343a40,
+  bg-box-color: #A7A7A7,
+  text-box-color: var(--light),
+);
+
+:root {
+  @each $type, $color in $colors {
+    --#{$type}: #{$color};
+  }
+}
+
+body {
+  color: var(--light);
+  background-color: var(--dark);
+}

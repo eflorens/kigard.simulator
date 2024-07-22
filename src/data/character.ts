@@ -133,7 +133,7 @@ export const Gifts: Gift[] = [
   }
 ];
 
-interface Breed {
+export interface Breed {
   id: BreedId;
   label: string;
   gifts: GiftId[];

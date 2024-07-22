@@ -127,6 +127,7 @@ export const simulatorSlice = createSlice({
   reducers: {
     setBreed: (state, action: PayloadAction<BreedId>) => {
       state.breed = action.payload;
+      state.experience = { ...initialState.experience};
       switch (action.payload) {
         case BreedId.ELF:
           state.character = createElf();
@@ -335,6 +336,6 @@ export const {
   addDiscretion,
 } = simulatorSlice.actions;
 
-export const selectSimulator = (state: RootState) => state.simulator;
+export const selectProfile = (state: RootState) => state.profile;
 
 export default simulatorSlice.reducer;
