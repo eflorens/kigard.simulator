@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import Character, { BreedId, createDwarf, createElf, createGnome, createHalfing, createHuman, createLycan, createOrc, createSaurian, createWildBeast } from '../../data/character';
+import Character, { BreedId, Breeds, Profile } from '../../data/character';
 
 export interface AttributeExperience {
   total: number;
@@ -25,15 +25,124 @@ interface Experience {
   discretion: AttributeExperience;
 }
 
-export interface SimulatorState {
+export interface EvolutionState {
   character: Character;
   experience: Experience;
   breed: BreedId;
 }
+const baseProfile: Profile = {
+  strength: 10,
+  dexterity: 10,
+  intelligence: 10,
+  constitution: 10,
+  mind: 10,
+  charisma: 10,
+  accuracy: 0,
+  dodge: 0,
+  magicAttack: 0,
+  magicDefense: 0,
+  observation: 0,
+  discretion: 0,
+  armor: 0,
+  damage: 0,
+  magicResistance: 0,
+  magicPower: 0,
+  magicRecovery: 1,
+};
+
+const createHuman = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.HUMAN) || Breeds[0],
+    profile: baseProfile
+  };
+}
+
+const createElf = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.ELF) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      dexterity: baseProfile.dexterity + 2,
+      accuracy: baseProfile.accuracy + 5,
+      magicAttack: baseProfile.magicAttack + 5,
+    }
+  };
+}
+
+const createOrc = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.ORC) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      strength: baseProfile.strength + 2,
+    }
+  };
+}
+
+const createDwarf = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.DWARF) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      constitution: baseProfile.constitution + 2,
+      magicDefense: baseProfile.magicDefense + 5,
+    }
+  };
+}
+
+const createGnome = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.GNOME) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      intelligence: baseProfile.intelligence + 2,
+      dodge: baseProfile.dodge + 5,
+      magicRecovery: baseProfile.magicRecovery + 1,
+    }
+  };
+}
+
+const createHalfing = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.HALFING) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      dodge: baseProfile.dodge + 5,
+      magicDefense: baseProfile.magicDefense + 5,
+    }
+  };
+}
+
+const createLycan = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.LYCAN) || Breeds[0],
+    profile: baseProfile
+  };
+}
+
+const createSaurian = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.SAURIAN) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      armor: baseProfile.armor + 2,
+    }
+  };
+}
+
+const createWildBeast = (): Character => {
+  return {
+    breed: Breeds.find(breed => breed.id === BreedId.WILDBEAST) || Breeds[0],
+    profile: {
+      ...baseProfile,
+      damage: baseProfile.damage + 2,
+    }
+  };
+}
 
 const xpCost = 50;
 
-const initialState: SimulatorState = {
+const initialState: EvolutionState = {
   character: createHuman(),
   breed: BreedId.HUMAN,
   experience: {
@@ -121,8 +230,8 @@ const computeImprovements = (current: AttributeExperience, nbImprovements: numbe
   return Math.min(10, Math.max(0, current.improvements + nbImprovements)) - current.improvements;
 }
 
-export const simulatorSlice = createSlice({
-  name: 'simulator',
+export const evolutionSlice = createSlice({
+  name: 'evolution',
   initialState,
   reducers: {
     setBreed: (state, action: PayloadAction<BreedId>) => {
@@ -334,8 +443,8 @@ export const {
   addMagicDefense,
   addObservation,
   addDiscretion,
-} = simulatorSlice.actions;
+} = evolutionSlice.actions;
 
-export const selectProfile = (state: RootState) => state.profile;
+export const selectEvolution = (state: RootState) => state.evolution;
 
-export default simulatorSlice.reducer;
+export default evolutionSlice.reducer;

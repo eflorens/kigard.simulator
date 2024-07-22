@@ -1,9 +1,9 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import profileReducer from '../features/profile/profileSlice';
+import evolutionReducer from '../features/evolution/evolutionSlice';
 
 export const store = configureStore({
   reducer: {
-    profile: profileReducer,
+    evolution: evolutionReducer,
   },
 });
 

@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   addStrength,
   addDexterity,
-  selectProfile,
+  selectEvolution,
   AttributeExperience,
   addIntelligence,
   addConsitution,
@@ -15,11 +15,9 @@ import {
   addMagicDefense,
   addObservation,
   addDiscretion,
-  setBreed,
-} from './profileSlice';
-import './Profile.module.css';
-import { Breed, Breeds, GiftId, Gifts } from '../../data/character';
-import { Badge, DropdownList, Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
+} from './evolutionSlice';
+import { GiftId, Gifts } from '../../data/character';
+import { Badge, Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
@@ -30,7 +28,6 @@ interface DisplayAttributeProps {
   unity?: string;
   onDecrement: () => void;
   onIncrement: () => void;
-
 }
 
 function DisplayAttribute({
@@ -44,8 +41,8 @@ function DisplayAttribute({
 
   return (
     <Row className='my-1'>
-      <Col>{label}</Col>
-      <Col xs="4">
+      <Col className="text-nowrap" xs="2">{label}</Col>
+      <Col xs="6">
         <Button
           color="primary"
           aria-label={`Decrement ${label}`}
@@ -67,7 +64,7 @@ function DisplayAttribute({
         </Button>
       </Col>
       <Col>{xp.next} PE</Col>
-      <Col>
+      <Col xs="1">
         <Tooltip description={`${xp.improvements} amélioration${xp.improvements > 1 ? "s" : ""}. Total : ${xp.total} PE`}>
           <FontAwesomeIcon icon={faCircleInfo} />
         </Tooltip>
@@ -77,7 +74,7 @@ function DisplayAttribute({
 
 }
 
-function DisplayGift({ id }: Readonly<{ id: GiftId }>) {
+export function DisplayGift({ id }: Readonly<{ id: GiftId }>) {
   const gift = Gifts.find(g => g.id === id);
   if (!gift) {
     return <></>
@@ -92,40 +89,12 @@ function DisplayGift({ id }: Readonly<{ id: GiftId }>) {
   );
 }
 
-export function DisplayBreed() {
-  const { character, experience, breed } = useAppSelector(selectProfile);
-  const dispatch = useAppDispatch();
-
-  return (
-    <Container className="text-center">
-      <Row>
-        <Col>
-          <DropdownList<Breed>
-            source={Breeds}
-            title="label"
-            value={Breeds.find(b => b.id === breed)}
-            onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))}
-          />
-        </Col>
-        <Col>
-          {character.breed.gifts.map((gift) => (<DisplayGift key={gift} id={gift} />))}
-        </Col>
-        <Col>
-          <span>Total : {experience.total} PE</span>
-        </Col>
-      </Row>
-    </Container>
-  );
-
-}
-
-export function Profile() {
-  const { character, experience } = useAppSelector(selectProfile);
+export function Evolution() {
+  const { character, experience } = useAppSelector(selectEvolution);
   const dispatch = useAppDispatch();
 
   return (
     <>
-      <DisplayBreed />
       <CardGroup>
         <Card>
           <CardBody>
@@ -230,19 +199,6 @@ export function Profile() {
           </CardBody>
         </Card>
       </CardGroup>
-      {/* <table className="default-table text-center">
-        <thead>
-          <tr>
-            <th>Attribut</th>
-            <th>Valeur</th>
-            <th>Améliorations</th>
-            <th>Coût prochaine</th>
-            <th>Coût total</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table> */}
     </>
   );
 }
