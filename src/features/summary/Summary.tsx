@@ -4,7 +4,10 @@ import { useAppSelector } from '../../app/hooks';
 import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Row } from '../../components';
 import { DisplayBreed } from '../evolution/DisplayBreed';
 import { selectSummary } from './SummarySlice';
-import { Weapon, ElementId } from '../../data/inventory';
+import { Weapon } from '../../data/inventory';
+import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
+import { DisplayElement } from '../../components/DisplayElement';
+import { DisplayStatus } from '../../components/DisplayStatus';
 
 interface AttributeProps {
   label: string;
@@ -30,18 +33,6 @@ function DisplayAttribute({ attributes }: Readonly<DisplayAttributeProps>) {
   );
 }
 
-function DisplayElement({ element }: { element: ElementId }) {
-  return (
-    <img src={`https://tournoi.kigard.fr/images/elements/${element}.gif`} alt={element.toString()} />
-  );
-}
-
-function DisplayElementaryResistance({ value, element }: Readonly<{ value: number, element: ElementId }>) {
-  return (
-    <span className="text-nowrap">{value}% <DisplayElement element={element} /></span>
-  );
-}
-
 function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
   if (!weapon) {
     return <Container>Aucune arme</Container>
@@ -60,10 +51,17 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
         <Col>
           <span className="text-nowrap">
             DGT&nbsp;
-            {weapon.damage}
+            {weapon.damage}&nbsp;
             {weapon.element && <DisplayElement element={weapon.element} />}
           </span>
         </Col>
+        {weapon.status && weapon.status.map(({value, status}) => (
+          <Col key={status}>
+            <span className="text-nowrap">{value}</span>
+            <DisplayStatus status={status} />
+          </Col>
+        ))}
+        <Col></Col>
       </Row>
     </Container>
   );
@@ -144,6 +142,7 @@ export function Summary() {
             <Badge pill color="secondary" className='float-start'>PA {summary.actionPointBonus > 0 && "+"}{summary.actionPointBonus}%</Badge>
             <span>Combat & Magie</span>
             <Badge pill color="secondary" className='float-end'>PM {summary.magicRecovery > 0 && "+"}{summary.magicRecovery}</Badge>
+            {summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
           </CardHeader>
           <CardBody>
             <DisplayAttribute

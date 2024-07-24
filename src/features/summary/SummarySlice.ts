@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, InventoryState, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, Weapon } from "../../data/inventory";
+import { GiftId } from "../../data/character";
 
 interface Attributes {
   strength: number;
@@ -21,6 +22,7 @@ interface Attributes {
   magicResistance: number;
   magicPower: number;
   actionPointsBonus: number;
+  regeneration: number;
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
@@ -43,6 +45,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       magicResistance: 0,
       magicPower: 0,
       actionPointsBonus: 0,
+      regeneration: 0,
     };
 
     const elementaryResistances = [{
@@ -142,6 +145,8 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     return { total, elementaryResistances };
   }
   const { total, elementaryResistances } = computeInventory(inventory);
+  const regeneration = (evolution.character.breed.gifts.some(gift => gift === GiftId.REGENERATION) ? (evolution.character.profile.constitution / 5) : 0)
+    + total.regeneration;
 
   const summary = {
     strength: evolution.character.profile.strength + total.strength,
@@ -162,20 +167,21 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     magicPower: evolution.character.profile.magicPower + total.magicPower,
     magicRecovery: evolution.character.profile.magicRecovery,
     actionPointBonus: evolution.character.profile.actionPointBonus + total.actionPointsBonus,
+    regeneration,
     elementaryResistances
   };
 
   const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon) || (inventory.hands as Inventory<Weapon>)?.item;
   const primaryWeapon = weapon && {
     ...weapon,
-    damage: (weapon.isRanged ? summary.dexterity : summary.strength) + (weapon.damage || 0),
+    damage: (weapon.range && weapon.range.min > 1 ? summary.dexterity : summary.strength) + (weapon.damage || 0),
     accuracy: summary.accuracy + (weapon?.accuracy || 0),
   };
 
   const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon;
   const secondaryWeapon = leftWeapon && {
     ...leftWeapon,
-    damage: (leftWeapon.isRanged ? summary.dexterity : summary.strength) + (leftWeapon.damage || 0),
+    damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength) + (leftWeapon.damage || 0),
     accuracy: summary.accuracy + (weapon?.accuracy || 0),
   };
 

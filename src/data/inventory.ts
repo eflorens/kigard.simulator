@@ -1,10 +1,10 @@
 export enum Status {
-  Stunned = 'Stunned',
-  Poisoned = 'Poisoned',
-  Burning = 'Burning',
-  Frozen = 'Frozen',
-  Bleeding = 'Bleeding',
-  Necrosis = 'Necrosis',
+  Stunned = 1,
+  Piercing = 3,
+  Poisoned = 4,
+  Necrosis = 9,
+  Burning = 16,
+  Bleeding = 17
 }
 
 export enum ElementId {
@@ -41,6 +41,7 @@ interface Attributes {
   magicResistance?: number;
   magicPower?: number;
   actionPointsBonus?: number;
+  regeneration?: number;
 }
 
 export interface Modifier extends Attributes {
@@ -104,8 +105,9 @@ export interface Item extends Attributes {
 
 export interface Weapon extends Item {
   usageCost: number;
-  isRanged: boolean;
+  range?: {min: number, max: number};
   element?: ElementId;
+  elementaryAffinity?: ElementId;
 }
 
 const head: Item[] = [{
@@ -438,14 +440,186 @@ const oneHand: Weapon[] = [{
   weight: 1,
   damage: 4,
   usageCost: 4,
-  isRanged: false,
 }, {
   id: 114,
   name: 'Lame',
   weight: 2,
   damage: 7,
   usageCost: 5,
-  isRanged: false,
+}, {
+  id: 56,
+  name: 'Glaive',
+  weight: 2,
+  damage: 4,
+  usageCost: 4,
+}, {
+  id: 196,
+  name: 'Langue démon',
+  weight: 2,
+  damage: 3,
+  usageCost: 4,
+  status: [{
+    value: 1,
+    status: Status.Necrosis,
+  }],
+}, {
+  id: 119,
+  name: 'Falchion',
+  weight: 2,
+  damage: 9,
+  usageCost: 5,
+}, {
+  id: 204,
+  name: 'Cimeterre',
+  weight: 2,
+  damage: 6,
+  usageCost: 4,
+}, {
+  id: 328,
+  name: 'Badelaire ardent',
+  weight: 2,
+  damage: 4,
+  usageCost: 5,
+  element: ElementId.Fire,
+  status: [{
+    value: 2,
+    status: Status.Burning,
+  }],
+}, {
+  id: 311,
+  name: 'Main-gauche', // Todo : specific bonus (damage +2 & accuracy +10%) when used at left hand
+  weight: 2,
+  damage: 3,
+  usageCost: 4,
+  dodge: 5,
+}, {
+  id: 252,
+  name: 'Lame solaire',
+  weight: 2,
+  damage: 6,
+  usageCost: 4,
+  element: ElementId.Light,
+  charisma: 2,
+}, {
+  id: 136,
+  name: 'Epée noble',
+  weight: 2,
+  damage: 4,
+  usageCost: 4,
+  intelligence: 2,
+}, {
+  id: 100,
+  name: 'Epée de spadassin',
+  weight: 2,
+  damage: 4,
+  accuracy: 10,
+  usageCost: 4,
+}, {
+  id: 27,
+  name: 'Barong',
+  weight: 2,
+  damage: 5,
+  usageCost: 5,
+  status: [{
+    value: 2,
+    status: Status.Bleeding,
+  }],
+}, {
+  id: 23,
+  name: 'Sceptre',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 4,
+}, {
+  id: 290,
+  name: 'Sceptre foudre',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 4,
+  element: ElementId.Thunder,
+  elementaryAffinity: ElementId.Thunder,
+}, {
+  id: 206,
+  name: 'Sceptre en mithril',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 3,
+  magicAttack: 10,
+  doubleSetting: true,
+}, {
+  id: 250,
+  name: 'Orbe démon',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 6,
+  mind: -2,
+  element: ElementId.Dark,
+  elementaryAffinity: ElementId.Dark,
+}, {
+  id: 309,
+  name: 'Orbe angélique',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 2,
+  mind: 2,
+  element: ElementId.Light,
+  elementaryAffinity: ElementId.Light,
+}, {
+  id: 110,
+  name: 'Crosse tellurique',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 5,
+  constitution: 1,
+}, {
+  id: 76,
+  name: 'Sceptre émeraude',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 4,
+  magicAttack: 10,
+}, {
+  id: 207,
+  name: 'Sceptre noble',
+  weight: 2,
+  damage: 5,
+  usageCost: 5,
+  magicPower: 4,
+}, {
+  id: 117,
+  name: 'Sceptre lumière',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 2,
+  observation: 10,
+  element: ElementId.Light,
+  elementaryAffinity: ElementId.Light,
+}, {
+  id: 205,
+  name: 'Sceptre glace',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 4,
+  element: ElementId.Ice,
+  elementaryAffinity: ElementId.Ice,
+}, {
+  id: 289,
+  name: 'Sceptre coeur',
+  weight: 2,
+  damage: 0,
+  usageCost: 4,
+  magicPower: 3,
+  intelligence: 2,
+  regeneration: 2,
 }];
 
 const twoHands: Weapon[] = [{
@@ -459,7 +633,6 @@ const twoHands: Weapon[] = [{
   }],
   doubleSetting: true,
   usageCost: 5,
-  isRanged: false,
 }, {
   id: 55,
   name: 'Bâton de voyage',
@@ -468,7 +641,6 @@ const twoHands: Weapon[] = [{
   usageCost: 4,
   doubleSetting: true,
   actionPointsBonus: 100,
-  isRanged: false,
 }, {
   id: 244,
   name: 'Hache double',
@@ -480,7 +652,6 @@ const twoHands: Weapon[] = [{
   }],
   doubleSetting: true,
   usageCost: 5,
-  isRanged: false,
 }];
 
 const feet: Item[] = [{
