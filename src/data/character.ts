@@ -230,6 +230,7 @@ export interface Profile {
   magicResistance: number;
   magicPower: number;
   magicRecovery: number;
+  actionPointBonus: number;
 }
 
 export default interface Character {

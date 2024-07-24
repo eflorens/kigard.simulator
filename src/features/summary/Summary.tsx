@@ -3,7 +3,8 @@ import { Fragment } from 'react/jsx-runtime';
 import { useAppSelector } from '../../app/hooks';
 import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Row } from '../../components';
 import { DisplayBreed } from '../evolution/DisplayBreed';
-import { selectEvolution } from '../evolution/evolutionSlice';
+import { selectSummary } from './SummarySlice';
+import { Weapon, ElementId } from '../../data/inventory';
 
 interface AttributeProps {
   label: string;
@@ -29,8 +30,75 @@ function DisplayAttribute({ attributes }: Readonly<DisplayAttributeProps>) {
   );
 }
 
+function DisplayElement({ element }: { element: ElementId }) {
+  return (
+    <img src={`https://tournoi.kigard.fr/images/elements/${element}.gif`} alt={element.toString()} />
+  );
+}
+
+function DisplayElementaryResistance({ value, element }: Readonly<{ value: number, element: ElementId }>) {
+  return (
+    <span className="text-nowrap">{value}% <DisplayElement element={element} /></span>
+  );
+}
+
+function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
+  if (!weapon) {
+    return <Container>Aucune arme</Container>
+  }
+
+  return (
+    <Container>
+      <Row>
+        <Col>{weapon.name}</Col>
+        <Col>
+          <span className="text-nowrap">
+            PRE&nbsp;
+            {weapon.accuracy}%
+          </span>
+        </Col>
+        <Col>
+          <span className="text-nowrap">
+            DGT&nbsp;
+            {weapon.damage}
+            {weapon.element && <DisplayElement element={weapon.element} />}
+          </span>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
+
+function DisplayWeapons() {
+  const { primaryWeapon, secondaryWeapon } = useAppSelector(selectSummary);
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <span>Arme principale</span>
+          <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>
+        </CardHeader>
+        <CardBody>
+          <DisplayWeapon weapon={primaryWeapon} />
+        </CardBody>
+      </Card>
+      <Card>
+        <CardHeader>
+          <span>Arme secondaire</span>
+          <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>
+        </CardHeader>
+        <CardBody>
+          <DisplayWeapon weapon={secondaryWeapon} />
+        </CardBody>
+      </Card>
+    </>
+  );
+}
+
 export function Summary() {
-  const { character } = useAppSelector(selectEvolution);
+
+  const { primaryWeapon, secondaryWeapon, ...summary } = useAppSelector(selectSummary);
 
   return (
     <>
@@ -41,52 +109,65 @@ export function Summary() {
           <CardBody>
             <DisplayAttribute
               attributes={[
-                { label: "FOR", value: character.profile.strength, unity: "number" },
-                { label: "PRE", value: character.profile.accuracy, unity: "percent" }
+                { label: "FOR", value: summary.strength, unity: "number" },
+                { label: "PRE", value: summary.accuracy, unity: "percent" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "DEX", value: character.profile.dexterity, unity: "number" },
-                { label: "ESQ", value: character.profile.dodge, unity: "percent" }
+                { label: "DEX", value: summary.dexterity, unity: "number" },
+                { label: "ESQ", value: summary.dodge, unity: "percent" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "INT", value: character.profile.intelligence, unity: "number" },
-                { label: "MM", value: character.profile.magicAttack, unity: "percent" }
+                { label: "INT", value: summary.intelligence, unity: "number" },
+                { label: "MM", value: summary.magicAttack, unity: "percent" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "CON", value: character.profile.constitution, unity: "number" },
-                { label: "DM", value: character.profile.magicDefense, unity: "percent" }
+                { label: "CON", value: summary.constitution, unity: "number" },
+                { label: "DM", value: summary.magicDefense, unity: "percent" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "ESP", value: character.profile.mind, unity: "number" },
-                { label: "OBS", value: character.profile.observation, unity: "percent" }
+                { label: "ESP", value: summary.mind, unity: "number" },
+                { label: "OBS", value: summary.observation, unity: "percent" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "CHA", value: character.profile.charisma, unity: "number" },
-                { label: "DIS", value: character.profile.discretion, unity: "percent" }
+                { label: "CHA", value: summary.charisma, unity: "number" },
+                { label: "DIS", value: summary.discretion, unity: "percent" }
               ]} />
           </CardBody>
         </Card>
         <Card>
           <CardHeader>
+            <Badge pill color="secondary" className='float-start'>PA {summary.actionPointBonus > 0 && "+"}{summary.actionPointBonus}%</Badge>
             <span>Combat & Magie</span>
-            <Badge pill color="secondary"className='float-end'>PM {character.profile.magicRecovery > 0 && "+"}{character.profile.magicRecovery}</Badge>
+            <Badge pill color="secondary" className='float-end'>PM {summary.magicRecovery > 0 && "+"}{summary.magicRecovery}</Badge>
           </CardHeader>
           <CardBody>
             <DisplayAttribute
               attributes={[
-                { label: "ARM", value: character.profile.armor, unity: "number" },
-                { label: "RES", value: character.profile.magicResistance, unity: "number" }
+                { label: "ARM", value: summary.armor, unity: "number" },
+                { label: "RES", value: summary.magicResistance, unity: "number" }
               ]} />
             <DisplayAttribute
               attributes={[
-                { label: "DGT", value: character.profile.damage, unity: "number" },
-                { label: "MAG", value: character.profile.magicPower, unity: "number" }
+                { label: "DGT", value: summary.damage, unity: "number" },
+                { label: "MAG", value: summary.magicPower, unity: "number" }
               ]} />
+          </CardBody>
+        </Card>
+      </CardGroup>
+      <DisplayWeapons />
+      <CardGroup>
+        <Card>
+          <CardHeader>Résistances élémentaires</CardHeader>
+          <CardBody>
+            {summary.elementaryResistances.map(({ value, element }) => (
+              <span key={element} className="mx-1">
+                <DisplayElementaryResistance value={value} element={element} />
+              </span>))}
           </CardBody>
         </Card>
       </CardGroup>

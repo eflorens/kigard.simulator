@@ -48,12 +48,16 @@ const baseProfile: Profile = {
   magicResistance: 0,
   magicPower: 0,
   magicRecovery: 1,
+  actionPointBonus: 0,
 };
 
 const createHuman = (): Character => {
   return {
     breed: Breeds.find(breed => breed.id === BreedId.HUMAN) || Breeds[0],
-    profile: baseProfile
+    profile: {
+      ...baseProfile,
+      actionPointBonus: 100,
+    }
   };
 }
 

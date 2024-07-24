@@ -5,6 +5,7 @@ import { Container } from 'reactstrap';
 import { Accordion, AccordionBody, AccordionHeader, AccordionItem, Layout } from './components';
 import { Summary } from './features/summary/Summary';
 import { useState } from 'react';
+import { Inventory } from './features/inventory/Inventory';
 
 function App() {
   const [open, setOpen] = useState("1");
@@ -31,7 +32,7 @@ function App() {
           <AccordionItem>
             <AccordionHeader targetId="2">Equipement</AccordionHeader>
             <AccordionBody accordionId="2">
-              <span>A venir</span>
+              <Inventory />
             </AccordionBody>
           </AccordionItem>
         </Accordion>

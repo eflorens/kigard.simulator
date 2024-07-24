@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import evolutionReducer from '../features/evolution/evolutionSlice';
+import inventoryReducer from '../features/inventory/inventorySlice';
 
 export const store = configureStore({
   reducer: {
     evolution: evolutionReducer,
+    inventory: inventoryReducer,
   },
 });
 
