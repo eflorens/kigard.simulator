@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectEvolution } from "../evolution/evolutionSlice";
-import { Inventory, InventoryState, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
+import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
 
@@ -26,7 +26,7 @@ interface Attributes {
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
-  const computeInventory = (inventory: InventoryState) => {
+  const computeInventory = (inventory: InventoryLocation) => {
     const total: Attributes = {
       strength: 0,
       dexterity: 0,
@@ -74,7 +74,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       element: ElementId.Wind
     }];
 
-    let slot: keyof InventoryState;
+    let slot: keyof InventoryLocation;
 
     for (slot in inventory) {
       const slotItem = inventory[slot] as Inventory<Item | Weapon>;

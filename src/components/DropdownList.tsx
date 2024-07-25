@@ -10,10 +10,11 @@ interface DropdownListProps<T> {
   value?: T;
   description?: string;
   hasEmpty?: boolean;
+  size?: string;
   onChange?: (item?: T, e?: React.ChangeEvent<any>) => void;
 }
 
-export function DropdownList<T>({ name, source, title, render, keyValue, value, description, hasEmpty, onChange }: DropdownListProps<T>) {
+export function DropdownList<T>({ name, source, title, render, keyValue, value, description, hasEmpty, size, onChange }: DropdownListProps<T>) {
   const [isOpen, setOpen] = useState(false);
 
   const handleChange: (e: MouseEvent<HTMLElement, globalThis.MouseEvent>, item?: T) => void = (e, item) => {
@@ -23,7 +24,7 @@ export function DropdownList<T>({ name, source, title, render, keyValue, value, 
   }
 
   return (
-    <Dropdown className="dropdownlist" direction="down" isOpen={isOpen} toggle={() => setOpen(!isOpen)}>
+    <Dropdown size={size} className="dropdownlist" direction="down" isOpen={isOpen} toggle={() => setOpen(!isOpen)}>
       {title && !render && <DropdownToggle caret>{value ? value[title] as string : description}</DropdownToggle>}
       {render && <DropdownToggle caret>{value ? render(value) : description}</DropdownToggle>}
       <DropdownMenu className="dropdownlist-content">
