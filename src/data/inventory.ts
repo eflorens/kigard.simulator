@@ -101,6 +101,7 @@ export interface Item extends Attributes {
     value: number;
     element: ElementId;
   }[];
+  magicalSpace?: number;
 }
 
 export interface Weapon extends Item {
@@ -434,7 +435,7 @@ const bust: Item[] = [{
   discretion: 10,
 }];
 
-const oneHand: Weapon[] = [{
+const oneHandWeapon: Weapon[] = [{
   id: 1,
   name: 'Epée courte',
   weight: 1,
@@ -654,6 +655,57 @@ const twoHands: Weapon[] = [{
   usageCost: 5,
 }];
 
+const oneHand: Item[] = [{
+  id: 256,
+  name: 'Tome de cristal',
+  weight: 2,
+  magicDefense: 5,
+  magicalSpace: 3,
+}, {
+  id: 257,
+  name: 'Testament rituel',
+  weight: 2,
+  mind: 1,
+  magicalSpace: 3,
+}, {
+  id: 226,
+  name: 'Recueil sacré',
+  weight: 2,
+  armor: 1,
+  magicalSpace: 3,
+}, {
+  id: 224,
+  name: 'Ouvrage sylvestre',
+  weight: 2,
+  dexterity: 1,
+  magicalSpace: 3,
+}, {
+  id: 227,
+  name: 'Livre des morts',
+  weight: 2,
+  strength: 1,
+  magicalSpace: 3,
+}, {
+  id: 275,
+  name: 'Grimoire astral',
+  weight: 2,
+  magicAttack: 5,
+  magicalSpace: 3,
+}, {
+  id: 24,
+  name: 'Grimoire',
+  weight: 2,
+  intelligence: 1,
+  magicalSpace: 3,
+}, {
+  id: 231,
+  name: 'Brassard runique',
+  weight: 2,
+  armor: 1,
+  magicAttack: 10,
+  magicalSpace: 1,
+}];
+
 const feet: Item[] = [{
   id: 30,
   name: 'Jambières',
@@ -678,4 +730,5 @@ const fetish: Item[] = [{
   actionPointsBonus: 50,
 }];
 
-export { head, bust, oneHand, twoHands, feet, fetish };
+const hand: (Item | Weapon)[] = [ ...oneHandWeapon, ...oneHand];
+export { head, bust, hand, twoHands, feet, fetish };

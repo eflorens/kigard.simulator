@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, CardGroup, CardHeader, Col, DropdownList } from "../../components";
-import { bust, allEnchantments, feet, fetish, head, Item, Modifier, oneHand, twoHands, Weapon, allSettings } from "../../data/inventory";
+import { bust, allEnchantments, feet, fetish, head, Item, Modifier, hand, twoHands, Weapon, allSettings } from "../../data/inventory";
 import { Inventory as InventoryItem, equipItem, equipLeftHand, equipRightHand, InventoryState, selectInventory, setEnchantment, setLeftHandEnchantment, setLeftHandSettings, setRightHandEnchantment, setRightHandSettings, setSettings, unequipItem, unequipLeftHand, unequipRightHand } from "./inventorySlice";
 import { DisplayElementaryResistance } from "../../components/DisplayElementaryResistance";
 import { DisplayStatus } from "../../components/DisplayStatus";
@@ -33,6 +33,7 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
     regeneration,
     status,
     elementaryResistances,
+    magicalSpace,
   } = item;
 
   const { element } = item as Weapon;
@@ -60,6 +61,7 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
       {!!regeneration && <span className="mx-1">REG: {regeneration}</span>}
       {!!status && status.map(s => <span key={s.status} className="mx-1">{s.value}<DisplayStatus status={s.status} /></span>)}
       {!!elementaryResistances && elementaryResistances.map(er => <span key={er.element} className="mx-1"><DisplayElementaryResistance element={er.element} value={er.value} /></span>)}
+      {!!magicalSpace && <span className="mx-1">{magicalSpace}<DisplayItemImage id={52} name="Parchemin" /></span>}
     </>
   );
 
@@ -206,7 +208,7 @@ export function Inventory() {
         onChange={item => handleRightHandChange(item)}
         onEnchantmentChange={e => handleRightHandEnchantmentChange(e)}
         onSettingsChange={s => handleRightHandSettingsChange(s)}
-        source={oneHand}
+        source={hand}
         current={inventory.hands && "rightHand" in inventory.hands ? inventory.hands.rightHand : undefined}
       />
       <ChooseItem
@@ -214,7 +216,7 @@ export function Inventory() {
         onChange={item => handleLeftHandChange(item)}
         onEnchantmentChange={e => handleLeftHandEnchantmentChange(e)}
         onSettingsChange={s => handleLeftHandSettingsChange(s)}
-        source={oneHand}
+        source={hand}
         current={inventory.hands && "leftHand" in inventory.hands ? inventory.hands.leftHand : undefined}
       />
       <ChooseItem
