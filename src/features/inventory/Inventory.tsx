@@ -4,6 +4,8 @@ import { bust, allEnchantments, feet, fetish, head, Item, Modifier, oneHand, two
 import { Inventory as InventoryItem, equipItem, equipLeftHand, equipRightHand, InventoryState, selectInventory, setEnchantment, setLeftHandEnchantment, setLeftHandSettings, setRightHandEnchantment, setRightHandSettings, setSettings, unequipItem, unequipLeftHand, unequipRightHand } from "./inventorySlice";
 import { DisplayElementaryResistance } from "../../components/DisplayElementaryResistance";
 import { DisplayStatus } from "../../components/DisplayStatus";
+import { DisplayItemImage } from "../../components/DisplayItemImage";
+import { DisplayElement } from "../../components/DisplayElement";
 
 function DisplayAttributeItem({ item }: { item?: Item }) {
   if (!item) {
@@ -32,6 +34,9 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
     status,
     elementaryResistances,
   } = item;
+
+  const { element } = item as Weapon;
+
   return (
     <>
       <span className="mx-1">-</span>
@@ -48,7 +53,7 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
       {!!observation && <span className="mx-1">OBS: {observation}%</span>}
       {!!discretion && <span className="mx-1">DIS: {discretion}%</span>}
       {!!armor && <span className="mx-1">ARM: {armor}</span>}
-      {!!damage && <span className="mx-1">DGT: {damage}</span>}
+      {damage !== undefined && <span className="mx-1">DGT: {damage}{!!element && <DisplayElement element={element} />}</span>}
       {!!magicResistance && <span className="mx-1">RES: {magicResistance}</span>}
       {!!magicPower && <span className="mx-1">MAG: {magicPower}</span>}
       {!!actionPointsBonus && <span className="mx-1">PA: {actionPointsBonus}%</span>}
@@ -67,7 +72,7 @@ function DisplayItem<T extends Item>({ item }: { item?: T }) {
 
   return (
     <>
-      <img src={`https://tournoi.kigard.fr/images/items/${item.id}.gif`} alt={item.name} />
+      <DisplayItemImage id={item.id} name={item.name} />
       <span>{item?.name}</span>
       <DisplayAttributeItem item={item} />
     </>
@@ -189,6 +194,14 @@ export function Inventory() {
         current={inventory.head}
       />
       <ChooseItem
+        label="Deux mains"
+        onChange={item => handleItemChange('hands', item)}
+        onEnchantmentChange={e => handleEnchantmentChange('hands', e)}
+        onSettingsChange={s => handleSettingsChange('hands', s)}
+        source={twoHands}
+        current={inventory.hands as InventoryItem<Weapon>}
+      />
+      <ChooseItem
         label="Main droite"
         onChange={item => handleRightHandChange(item)}
         onEnchantmentChange={e => handleRightHandEnchantmentChange(e)}
@@ -203,14 +216,6 @@ export function Inventory() {
         onSettingsChange={s => handleLeftHandSettingsChange(s)}
         source={oneHand}
         current={inventory.hands && "leftHand" in inventory.hands ? inventory.hands.leftHand : undefined}
-      />
-      <ChooseItem
-        label="Deux mains"
-        onChange={item => handleItemChange('hands', item)}
-        onEnchantmentChange={e => handleEnchantmentChange('hands', e)}
-        onSettingsChange={s => handleSettingsChange('hands', s)}
-        source={twoHands}
-        current={inventory.hands as InventoryItem<Weapon>}
       />
       <ChooseItem
         label="Buste"

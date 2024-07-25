@@ -2,12 +2,12 @@
 import { Fragment } from 'react/jsx-runtime';
 import { useAppSelector } from '../../app/hooks';
 import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Row } from '../../components';
-import { DisplayBreed } from '../evolution/DisplayBreed';
 import { selectSummary } from './SummarySlice';
 import { Weapon } from '../../data/inventory';
 import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
 import { DisplayElement } from '../../components/DisplayElement';
 import { DisplayStatus } from '../../components/DisplayStatus';
+import { DisplayItemImage } from '../../components/DisplayItemImage';
 
 interface AttributeProps {
   label: string;
@@ -41,6 +41,7 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
   return (
     <Container>
       <Row>
+        <Col><DisplayItemImage id={weapon.id} name={weapon.name} /></Col>
         <Col>{weapon.name}</Col>
         <Col>
           <span className="text-nowrap">
@@ -55,7 +56,7 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
             {weapon.element && <DisplayElement element={weapon.element} />}
           </span>
         </Col>
-        {weapon.status && weapon.status.map(({value, status}) => (
+        {weapon.status && weapon.status.map(({ value, status }) => (
           <Col key={status}>
             <span className="text-nowrap">{value}</span>
             <DisplayStatus status={status} />
@@ -75,7 +76,7 @@ function DisplayWeapons() {
       <Card>
         <CardHeader>
           <span>Arme principale</span>
-          <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>
+          {primaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>}
         </CardHeader>
         <CardBody>
           <DisplayWeapon weapon={primaryWeapon} />
@@ -84,7 +85,7 @@ function DisplayWeapons() {
       <Card>
         <CardHeader>
           <span>Arme secondaire</span>
-          <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>
+          {secondaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>}
         </CardHeader>
         <CardBody>
           <DisplayWeapon weapon={secondaryWeapon} />
@@ -100,7 +101,6 @@ export function Summary() {
 
   return (
     <>
-      <DisplayBreed />
       <CardGroup>
         <Card>
           <CardHeader>Attributs</CardHeader>
@@ -139,10 +139,10 @@ export function Summary() {
         </Card>
         <Card>
           <CardHeader>
-            <Badge pill color="secondary" className='float-start'>PA {summary.actionPointBonus > 0 && "+"}{summary.actionPointBonus}%</Badge>
             <span>Combat & Magie</span>
             <Badge pill color="secondary" className='float-end'>PM {summary.magicRecovery > 0 && "+"}{summary.magicRecovery}</Badge>
-            {summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
+            {!!summary.actionPointBonus && <Badge pill color="secondary" className='float-end'>PA {summary.actionPointBonus > 0 && "+"}{summary.actionPointBonus}%</Badge>}
+            {!!summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
           </CardHeader>
           <CardBody>
             <DisplayAttribute

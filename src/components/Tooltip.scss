@@ -1,25 +1,3 @@
-$placements: [
-    top
-    bottom
-    right
-    left
-];
-
-.tooltip-custom {
-    .tooltip-inner {
-        color: var(--text-box-color);
-        background-color: var(--bg-box-color);
-    }
-
-    @each $placement in [top bottom left right] {
-        .bs-tooltip-auto[x-placement^="#{$placement}"] {
-            .arrow::before {
-                border-#{$placement}-color: var(--bg-box-color);
-              }
-        }
-    }
-}
-
 .tooltip-target {
     cursor: pointer;
 }

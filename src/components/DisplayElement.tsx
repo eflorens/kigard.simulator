@@ -1,8 +1,13 @@
 import { ElementId } from "../data/inventory";
 
 
-export function DisplayElement({ element }: { element: ElementId; }) {
+export function DisplayElement({ element, src, alt, className, ...props }: { element: ElementId; } & Readonly<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>>) {
   return (
-    <img src={`https://tournoi.kigard.fr/images/elements/${element}.gif`} alt={element.toString()} />
+    <img
+      src={`https://tournoi.kigard.fr/images/elements/${element}.gif`}
+      className={className}
+      alt={alt || element.toString()}
+      {...props}
+    />
   );
 }

@@ -26,7 +26,7 @@ export function DropdownList<T>({ name, source, title, render, keyValue, value, 
     <Dropdown className="dropdownlist" direction="down" isOpen={isOpen} toggle={() => setOpen(!isOpen)}>
       {title && !render && <DropdownToggle caret>{value ? value[title] as string : description}</DropdownToggle>}
       {render && <DropdownToggle caret>{value ? render(value) : description}</DropdownToggle>}
-      <DropdownMenu dark className="dropdownlist-content">
+      <DropdownMenu className="dropdownlist-content">
         {hasEmpty && (
           <>
             <DropdownItem key={0} active={!value} onClick={e => handleChange(e)}>Aucun</DropdownItem>

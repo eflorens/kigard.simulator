@@ -1,15 +1,15 @@
-import { Navbar, NavbarBrand } from './Navbar';
 import { Container } from './Container';
+import { Navbar, NavbarBrand } from './Navbar';
 
 export function Layout({ children }: Readonly<{ children?: React.ReactNode }>) {
   return (
-    <Container data-bs-theme="dark">
+    <Container>
       <Navbar>
         <NavbarBrand>Simulateur Kigard</NavbarBrand>
       </Navbar>
-      <Container className="text-center">
+      <div>
         {children}
-      </Container>
+      </div>
     </Container>
   )
 }

@@ -1,41 +1,55 @@
-import { Evolution } from './features/evolution/Evolution';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.scss';
 import { Container } from 'reactstrap';
-import { Accordion, AccordionBody, AccordionHeader, AccordionItem, Layout } from './components';
-import { Summary } from './features/summary/Summary';
-import { useState } from 'react';
-import { Inventory } from './features/inventory/Inventory';
+import { Layout, Nav, NavItem, NavLink, TabContent, TabPane } from "./components";
+import { Evolution } from "./features/evolution/Evolution";
+import { Inventory } from "./features/inventory/Inventory";
+import { useState } from "react";
+import { Summary } from "./features/summary/Summary";
+import { DisplayBreed } from './features/evolution/DisplayBreed';
+
+enum Tabs {
+  Evolution = 1,
+  Inventory = 2,
+  Summary = 3,
+}
+
+function Toolbox() {
+  const [open, setOpen] = useState(Tabs.Evolution);
+
+  return (
+    <>
+      <Nav pills >
+        <NavItem active={open === Tabs.Evolution} onClick={() => setOpen(Tabs.Evolution)}>
+          <NavLink active={open === Tabs.Evolution} href='#'>Evolution</NavLink>
+        </NavItem>
+        <NavItem active={open === Tabs.Inventory} onClick={() => setOpen(Tabs.Inventory)}>
+          <NavLink active={open === Tabs.Inventory} href='#'>Equipement</NavLink>
+        </NavItem>
+        <NavItem active={open === Tabs.Summary} onClick={() => setOpen(Tabs.Summary)}>
+          <NavLink active={open === Tabs.Summary} href='#'>Résumé</NavLink>
+        </NavItem>
+      </Nav>
+      <TabContent activeTab={open}>
+        <TabPane tabId={Tabs.Evolution}>
+          <Evolution />
+        </TabPane>
+        <TabPane tabId={Tabs.Inventory}>
+          <Inventory />
+        </TabPane>
+        <TabPane tabId={Tabs.Summary}>
+          <Summary />
+        </TabPane>
+      </TabContent>
+    </>
+  );
+}
 
 function App() {
-  const [open, setOpen] = useState("1");
-
-  const toggle = (id: string) => {
-    if (open === id) {
-      setOpen("");
-    } else {
-      setOpen(id);
-    }
-  };
-  
   return (
     <Layout>
       <Container>
-      <Summary />
-      <Accordion flush open={open} toggle={toggle} className="mt-1">
-          <AccordionItem>
-            <AccordionHeader targetId="1">Evolution</AccordionHeader>
-            <AccordionBody accordionId="1">
-              <Evolution />
-            </AccordionBody>
-          </AccordionItem>
-          <AccordionItem>
-            <AccordionHeader targetId="2">Equipement</AccordionHeader>
-            <AccordionBody accordionId="2">
-              <Inventory />
-            </AccordionBody>
-          </AccordionItem>
-        </Accordion>
+        <DisplayBreed />
+        <Toolbox />
       </Container>
     </Layout>
   );

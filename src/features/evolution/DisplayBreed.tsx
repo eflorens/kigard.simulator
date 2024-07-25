@@ -1,7 +1,7 @@
 import { useAppSelector, useAppDispatch } from "../../app/hooks";
-import { Container, Row, Col, DropdownList, Badge } from "../../components";
+import { Row, Col, DropdownList, Badge } from "../../components";
 import { Breed, Breeds } from "../../data/character";
-import { DisplayGift } from "./Evolution";
+import { DisplayGift } from '../../components/DisplayGift';
 import { selectEvolution, setBreed } from "./evolutionSlice";
 
 
@@ -10,23 +10,21 @@ export function DisplayBreed() {
   const dispatch = useAppDispatch();
 
   return (
-    <Container className="text-center">
-      <Row>
-        <Col xs="1">
+    <Row>
+        <Col>
           <DropdownList<Breed>
             source={Breeds}
             title="label"
             value={Breeds.find(b => b.id === breed)}
             onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))} />
         </Col>
-        <Col>
+        <Col className="text-center">
           {character.breed.gifts.map((gift) => (<DisplayGift key={gift} id={gift} />))}
         </Col>
-        <Col xs="1">
+        <Col className="text-end">
           <Badge pill>{experience.total} PE</Badge>
         </Col>
-      </Row>
-    </Container>
+    </Row>
   );
 
 }

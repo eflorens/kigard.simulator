@@ -16,8 +16,7 @@ import {
   addObservation,
   addDiscretion,
 } from './evolutionSlice';
-import { GiftId, Gifts } from '../../data/character';
-import { Badge, Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
+import { Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 
@@ -72,21 +71,6 @@ function DisplayAttribute({
     </Row>
   );
 
-}
-
-export function DisplayGift({ id }: Readonly<{ id: GiftId }>) {
-  const gift = Gifts.find(g => g.id === id);
-  if (!gift) {
-    return <></>
-  }
-
-  return (
-    <Badge pill color="primary" className="mx-1">
-      <Tooltip description={gift.description}>
-        {gift.label}
-      </Tooltip>
-    </Badge>
-  );
 }
 
 export function Evolution() {
