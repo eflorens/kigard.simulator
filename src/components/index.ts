@@ -6,6 +6,7 @@ import { DropdownList } from "./DropdownList";
 import { Layout } from "./Layout";
 import { Nav, NavItem, NavLink } from "./Nav";
 import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
+import { Progress } from "./Progress";
 import { TabContent, TabPane } from "./TabContent";
 import { Tooltip } from "./Tooltip";
 
@@ -28,6 +29,7 @@ export {
     Navbar,
     NavbarBrand,
     NavbarText,
+    Progress,
     TabContent,
     TabPane,
     Tooltip

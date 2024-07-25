@@ -83,6 +83,9 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
         if (slotItem.enchantment) {
           for (attribute in slotItem.enchantment as Attributes) {
             total[attribute] += slotItem.enchantment[attribute] || 0;
+            if (slotItem.item.enhancedEnchantment) {
+              total[attribute] += slotItem.enchantment[attribute] || 0;
+            }
           }
         }
         if (slotItem.settings) {
@@ -168,7 +171,11 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     magicRecovery: evolution.character.profile.magicRecovery,
     actionPointBonus: evolution.character.profile.actionPointBonus + total.actionPointsBonus,
     regeneration,
-    elementaryResistances
+    elementaryResistances,
+    empathie: Math.floor((evolution.character.profile.charisma + total.charisma) / 5),
+    memory: Math.floor((evolution.character.profile.mind + total.mind) / 5),
+    mana: (evolution.character.profile.mind + total.mind) * 2,
+    vitality: (evolution.character.profile.constitution + total.constitution) * 10,
   };
 
   const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon) || (inventory.hands as Inventory<Weapon>)?.item;

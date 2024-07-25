@@ -1,7 +1,7 @@
 
 import { Fragment } from 'react/jsx-runtime';
 import { useAppSelector } from '../../app/hooks';
-import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Row } from '../../components';
+import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Progress, Row } from '../../components';
 import { selectSummary } from './SummarySlice';
 import { Weapon } from '../../data/inventory';
 import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
@@ -20,16 +20,32 @@ interface DisplayAttributeProps {
 }
 function DisplayAttribute({ attributes }: Readonly<DisplayAttributeProps>) {
   return (
-    <Container className="text-center">
-      <Row>
-        {attributes.map(({ label, value, unity }) => (
-          <Fragment key={label}>
-            <Col>{label}</Col>
-            <Col>{value}{unity === "percent" && " %"}</Col>
-          </Fragment>
-        ))}
-      </Row>
-    </Container>
+    <Row>
+      {attributes.map(({ label, value, unity }) => (
+        <Fragment key={label}>
+          <Col>{label}</Col>
+          <Col>{value}{unity === "percent" && " %"}</Col>
+        </Fragment>
+      ))}
+    </Row>
+  );
+}
+
+function DisplayVitality({ vitality }: { vitality: number }) {
+  return (
+    <Row>
+      <Col xs="3">PV</Col>
+      <Col><Progress value={100} color="danger">{vitality}</Progress></Col>
+    </Row>
+  );
+}
+
+function DisplayMana({ mana }: { mana: number }) {
+  return (
+    <Row>
+      <Col xs="3">PM</Col>
+      <Col><Progress value={100} color="success">{mana}</Progress></Col>
+    </Row>
   );
 }
 
@@ -41,7 +57,7 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
   return (
     <Container>
       <Row>
-        <Col><DisplayItemImage id={weapon.id} name={weapon.name} /></Col>
+        <Col xs="1"><DisplayItemImage id={weapon.id} name={weapon.name} /></Col>
         <Col>{weapon.name}</Col>
         <Col>
           <span className="text-nowrap">
@@ -62,8 +78,23 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
             <DisplayStatus status={status} />
           </Col>
         ))}
-        <Col></Col>
       </Row>
+      {weapon.elementaryAffinity && <>
+        <Row>
+          <Col>
+            <span className="me-1 fw-bold">Affinité élémentaire</span>
+            <DisplayElement element={weapon.elementaryAffinity} />
+          </Col>
+        </Row>
+        <Row>
+          <Col className="fst-italic">
+            <span className="fw-bold">MAG +2</span>
+            <span> et </span>
+            <span className="fw-bold">MM +10%</span>
+            <span> pour lancer un sort de cet élément</span>
+          </Col>
+        </Row>
+      </>}
     </Container>
   );
 }
@@ -105,36 +136,38 @@ export function Summary() {
         <Card>
           <CardHeader>Attributs</CardHeader>
           <CardBody>
-            <DisplayAttribute
-              attributes={[
-                { label: "FOR", value: summary.strength, unity: "number" },
-                { label: "PRE", value: summary.accuracy, unity: "percent" }
-              ]} />
-            <DisplayAttribute
-              attributes={[
-                { label: "DEX", value: summary.dexterity, unity: "number" },
-                { label: "ESQ", value: summary.dodge, unity: "percent" }
-              ]} />
-            <DisplayAttribute
-              attributes={[
-                { label: "INT", value: summary.intelligence, unity: "number" },
-                { label: "MM", value: summary.magicAttack, unity: "percent" }
-              ]} />
-            <DisplayAttribute
-              attributes={[
-                { label: "CON", value: summary.constitution, unity: "number" },
-                { label: "DM", value: summary.magicDefense, unity: "percent" }
-              ]} />
-            <DisplayAttribute
-              attributes={[
-                { label: "ESP", value: summary.mind, unity: "number" },
-                { label: "OBS", value: summary.observation, unity: "percent" }
-              ]} />
-            <DisplayAttribute
-              attributes={[
-                { label: "CHA", value: summary.charisma, unity: "number" },
-                { label: "DIS", value: summary.discretion, unity: "percent" }
-              ]} />
+            <Container className="text-center">
+              <DisplayAttribute
+                attributes={[
+                  { label: "FOR", value: summary.strength, unity: "number" },
+                  { label: "PRE", value: summary.accuracy, unity: "percent" }
+                ]} />
+              <DisplayAttribute
+                attributes={[
+                  { label: "DEX", value: summary.dexterity, unity: "number" },
+                  { label: "ESQ", value: summary.dodge, unity: "percent" }
+                ]} />
+              <DisplayAttribute
+                attributes={[
+                  { label: "INT", value: summary.intelligence, unity: "number" },
+                  { label: "MM", value: summary.magicAttack, unity: "percent" }
+                ]} />
+              <DisplayAttribute
+                attributes={[
+                  { label: "CON", value: summary.constitution, unity: "number" },
+                  { label: "DM", value: summary.magicDefense, unity: "percent" }
+                ]} />
+              <DisplayAttribute
+                attributes={[
+                  { label: "ESP", value: summary.mind, unity: "number" },
+                  { label: "OBS", value: summary.observation, unity: "percent" }
+                ]} />
+              <DisplayAttribute
+                attributes={[
+                  { label: "CHA", value: summary.charisma, unity: "number" },
+                  { label: "DIS", value: summary.discretion, unity: "percent" }
+                ]} />
+            </Container>
           </CardBody>
         </Card>
         <Card>
@@ -145,6 +178,8 @@ export function Summary() {
             {!!summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
           </CardHeader>
           <CardBody>
+            <DisplayVitality vitality={summary.vitality} />
+            <DisplayMana mana={summary.mana} />
             <DisplayAttribute
               attributes={[
                 { label: "ARM", value: summary.armor, unity: "number" },
@@ -154,6 +189,11 @@ export function Summary() {
               attributes={[
                 { label: "DGT", value: summary.damage, unity: "number" },
                 { label: "MAG", value: summary.magicPower, unity: "number" }
+              ]} />
+            <DisplayAttribute
+              attributes={[
+                { label: "EMP", value: summary.empathie, unity: "number" },
+                { label: "MEM", value: summary.memory, unity: "number" }
               ]} />
           </CardBody>
         </Card>
