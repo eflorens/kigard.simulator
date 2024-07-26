@@ -317,6 +317,13 @@ const bust: Item[] = [{
   armor: 3,
   magicResistance: 3,
 }, {
+  id: 58,
+  name: 'Tunique en soie',
+  weight: 2,
+  dodge: 15,
+  magicDefense: 15,
+  intelligence: 2,
+}, {
   id: 129,
   name: 'Tenue améthyste',
   weight: 2,
