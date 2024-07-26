@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
-import { ElementId, Item, Weapon } from "../../data/inventory";
+import { ElementId, Item, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
 
 interface Attributes {
@@ -74,79 +74,68 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       element: ElementId.Wind
     }];
 
-    let slot: keyof InventoryLocation;
+    const getModifiers = ({ enchantment, item, settings }: Inventory<Item | Weapon>) => {
+      if (!item) {
+        return [];
+      }
 
-    for (slot in inventory) {
-      const slotItem = inventory[slot] as Inventory<Item | Weapon>;
-      if (slotItem?.item) {
-        let attribute: keyof Attributes;
-        if (slotItem.enchantment) {
-          for (attribute in slotItem.enchantment as Attributes) {
-            total[attribute] += slotItem.enchantment[attribute] || 0;
-            if (slotItem.item.enhancedEnchantment) {
-              total[attribute] += slotItem.enchantment[attribute] || 0;
-            }
-          }
-        }
-        if (slotItem.settings) {
-          for (attribute in total) {
-            total[attribute] += (slotItem.settings.first && slotItem.settings.first[attribute]) || 0;
-            total[attribute] += (slotItem.settings.second && slotItem.settings.second[attribute]) || 0;
-          }
-        }
-        for (attribute in total) {
-          if (slot === 'hands' && (attribute === 'damage' || attribute === 'accuracy')) {
-            continue;
-          }
+      const enchantments = !enchantment ? [] : item.enhancedEnchantment
+        ? [enchantment, enchantment]
+        : [enchantment];
+      const settingCollection = [settings.first, settings.second]
+        .filter(setting => !!setting);
 
-          total[attribute] += slotItem.item[attribute] || 0;
-        }
+      return [...enchantments, ...settingCollection];
+    }
 
-        if (slotItem.item.elementaryResistances) {
-          slotItem.item.elementaryResistances.forEach(({ value, element }) => {
-            elementaryResistances.find(res => res.element === element)!.value += value;
-          });
+    type ItemSlot = keyof InventoryLocation | "leftHand" | "rightHand";
+
+    const items = (Object.keys(inventory) as (keyof InventoryLocation)[])
+      .map(slot => {
+        return { slot: slot as ItemSlot, item: inventory[slot] as Inventory<Item | Weapon> };
+      });
+    const itemPerHand = inventory.hands as OneItemPerHand;
+    if (itemPerHand?.rightHand) {
+      items.push({ slot: "rightHand", item: itemPerHand.rightHand });
+    }
+    if (itemPerHand?.leftHand) {
+      items.push({ slot: "leftHand", item: itemPerHand.leftHand });
+    }
+
+    const modifiers = items
+      .map(({ item }) => getModifiers(item))
+      .reduce((previous, current) => previous.concat(current), [])
+      .reduce<Modifier[]>((previous, current) => {
+        return current && previous.filter(modifier => modifier.description === current.description).length < 3
+          ? [...previous, current]
+          : previous;
+      }, []);
+
+    let attribute: keyof Attributes;
+    for (const { slot, item } of items) {
+      if (item.item) {
+        for (attribute in item.item as Attributes) {
+          if ((slot !== "hands" && slot !== "rightHand" && slot !== "leftHand") || (attribute !== "accuracy" && attribute !== "damage")) {
+            total[attribute] += item.item[attribute] || 0;
+          }
         }
       }
     }
-
-    const hands = inventory.hands as OneItemPerHand;
-
-    if (hands && (hands.rightHand || hands.leftHand)) {
-      let attribute: keyof Attributes;
-      if (hands.rightHand?.enchantment) {
-        for (attribute in hands.rightHand.enchantment as Attributes) {
-          total[attribute] += hands.rightHand.enchantment[attribute] || 0;
-        }
-      }
-      if (hands.rightHand?.settings) {
-        for (attribute in total) {
-          total[attribute] += (hands.rightHand.settings.first && hands.rightHand.settings.first[attribute]) || 0;
-          total[attribute] += (hands.rightHand.settings.second && hands.rightHand.settings.second[attribute]) || 0;
-        }
-      }
-      if (hands.leftHand?.enchantment) {
-        for (attribute in hands.leftHand.enchantment as Attributes) {
-          total[attribute] += hands.leftHand.enchantment[attribute] || 0;
-        }
-      }
-      if (hands.leftHand?.settings) {
-        for (attribute in total) {
-          total[attribute] += (hands.leftHand.settings.first && hands.leftHand.settings.first[attribute]) || 0;
-          total[attribute] += (hands.leftHand.settings.second && hands.leftHand.settings.second[attribute]) || 0;
-        }
-      }
-      for (attribute in total) {
-        if (attribute === 'damage' || attribute === 'accuracy') {
-          continue;
-        }
-        total[attribute] += (hands.rightHand?.item && hands.rightHand?.item[attribute]) || 0;
-        total[attribute] += (hands.leftHand?.item && hands.leftHand?.item[attribute]) || 0;
+    for (const modifier of modifiers) {
+      for (attribute in modifier as Attributes) {
+        total[attribute] += modifier[attribute] || 0;
       }
     }
+
+    items.forEach(({ item }) => {
+      item.item?.elementaryResistances?.forEach(({ value, element }) => {
+        elementaryResistances.find(res => res.element === element)!.value += value;
+      });
+    });
 
     return { total, elementaryResistances };
   }
+
   const { total, elementaryResistances } = computeInventory(inventory);
   const regeneration = (evolution.character.breed.gifts.some(gift => gift === GiftId.REGENERATION) ? (evolution.character.profile.constitution / 5) : 0)
     + total.regeneration;
@@ -186,10 +175,13 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
   };
 
   const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon;
+  const isLeftHand = leftWeapon?.id === 311;
   const secondaryWeapon = leftWeapon && {
     ...leftWeapon,
-    damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength) + (leftWeapon.damage || 0),
-    accuracy: summary.accuracy + (weapon?.accuracy || 0),
+    damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength)
+      + (leftWeapon.damage || 0)
+      + ((isLeftHand && 2) || 0),
+    accuracy: summary.accuracy + (weapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
   };
 
   return {
