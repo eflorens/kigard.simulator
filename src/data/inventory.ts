@@ -45,48 +45,62 @@ interface Attributes {
 }
 
 export interface Modifier extends Attributes {
+  id: number;
   description: string;
 }
 
 export const allEnchantments: Modifier[] = [{
+  id: 1,
   description: "+5% OBS",
   observation: 5,
 }, {
+  id: 2,
   description: "+5% PRE",
   accuracy: 5,
 }, {
+  id: 3,
   description: "+5% MM",
   magicAttack: 5,
 }, {
+  id: 4,
   description: "+5% DIS",
   discretion: 5,
 }, {
+  id: 5,
   description: "+5% ESQ",
   dodge: 5,
 }, {
+  id: 6,
   description: "+5% DM",
   magicDefense: 5,
 }, {
+  id: 7,
   description: "+25% PA",
   actionPointsBonus: 25,
 }];
 
 export const allSettings: Modifier[] = [{
+  id: 8,
   description: "+1 FOR",
   strength: 1,
 }, {
+  id: 9,
   description: "+1 DEX",
   dexterity: 1,
 }, {
+  id: 10,
   description: "+1 INT",
   intelligence: 1,
 }, {
+  id: 11,
   description: "+1 CON",
   constitution: 1,
 }, {
+  id: 12,
   description: "+1 CHA",
   charisma: 1,
 }, {
+  id: 13,
   description: "+1 ESP",
   mind: 1,
 }];
@@ -647,6 +661,7 @@ const oneHandWeapon: Weapon[] = [{
   name: 'Poignard',
   weight: 1,
   usageCost: 4,
+  damage: 3,
   status: [{
     value: 1,
     status: Status.Piercing,

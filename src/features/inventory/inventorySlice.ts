@@ -1,6 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Item, Modifier, Weapon } from '../../data/inventory';
-import { Talent } from '../../data/talents';
+import { allEnchantments, allSettings, bust, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
+import { magicScrolls, Talent } from '../../data/talents';
+
+interface ShareItem {
+  id: number;
+  enchantmentId?: number;
+  settingsId?: number[];
+}
+
+export interface ShareInventory {
+  head?: ShareItem;
+  hands?: ShareItem;
+  leftHand?: ShareItem;
+  rightHand?: ShareItem;
+  bust?: ShareItem;
+  feet?: ShareItem;
+  fetish?: ShareItem;
+  magicScrolls?: {
+    rightHand: number[],
+    leftHand: number[],
+  };
+}
 
 export interface Inventory<T extends Item> {
   enchantment?: Modifier;
@@ -44,10 +64,51 @@ function computeSettingsOnItemChange<T extends Item>(current?: Inventory<T>, ite
     : { first: current.settings.second, second: undefined };
 }
 
+function loadItem<T extends Item>(allItems: T[], shareItem?: ShareItem) {
+  const enchantment = (shareItem?.enchantmentId && allEnchantments.find(e => e.id === shareItem.enchantmentId)) || undefined;
+  const settings = shareItem?.settingsId?.map(id => allSettings.find(s => s.id === id)).filter(s => !!s) || [];
+  const item = (shareItem && allItems.find(i => i.id === shareItem.id)) || undefined;
+
+  return {
+    enchantment,
+    settings: {
+      first: settings[0],
+      second: settings[1],
+    },
+    item,
+  };
+}
+
+const loadMagicScrolls = (hand?: number[]) => {
+  return hand?.map((id, index) => ({ id, index })).reduce((previous, current) => {
+    previous[current.index] = magicScrolls.find(e => e.id === current.id) as Talent;
+    return previous;
+  }, {} as { [index: number]: Talent }) || {};
+}
+
 const inventorySlice = createSlice({
   name: 'inventory',
   initialState,
   reducers: {
+    load(state, action: PayloadAction<ShareInventory>) {
+      state.head = loadItem(head, action.payload.head);
+      state.bust = loadItem(bust, action.payload.bust);
+      state.feet = loadItem(head, action.payload.feet);
+      state.fetish = loadItem(head, action.payload.fetish);
+      if (!!action.payload.hands) {
+        state.hands = loadItem(twoHands, action.payload.hands);
+      }
+      else {
+        state.hands = {
+          leftHand: loadItem(hand, action.payload.leftHand),
+          rightHand: loadItem(hand, action.payload.rightHand),
+        }
+        state.magicScrolls = {
+          rightHand: loadMagicScrolls(action.payload.magicScrolls?.rightHand),
+          leftHand: loadMagicScrolls(action.payload.magicScrolls?.leftHand)
+        };
+      }
+    },
     setMagicScrolls(state, action: PayloadAction<{ index: number, slot: "rightHand" | "leftHand", talent: Talent }>) {
       const { index, talent, slot } = action.payload;
       state.magicScrolls[slot][index] = talent;
@@ -170,8 +231,7 @@ const inventorySlice = createSlice({
         }
       };
 
-      if (action.payload.magicalSpace)
-      {
+      if (action.payload.magicalSpace) {
         const rightHand = Array.from(Array(action.payload.magicalSpace).keys())
           .map((_, index) => state.magicScrolls.rightHand[index]);
         state.magicScrolls = {
@@ -204,8 +264,7 @@ const inventorySlice = createSlice({
         }
       };
 
-      if (action.payload.magicalSpace)
-      {
+      if (action.payload.magicalSpace) {
         const leftHand = Array.from(Array(action.payload.magicalSpace).keys())
           .map((_, index) => state.magicScrolls.leftHand[index]);
         state.magicScrolls = {
@@ -231,6 +290,7 @@ const inventorySlice = createSlice({
 });
 
 export const {
+  load,
   setMagicScrolls,
   unsetMagicScrolls,
   setEnchantment,

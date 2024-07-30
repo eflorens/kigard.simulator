@@ -1,20 +1,9 @@
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
-  addStrength,
-  addDexterity,
   selectEvolution,
   AttributeExperience,
-  addIntelligence,
-  addConsitution,
-  addMind,
-  addCharisma,
-  addAccuracy,
-  addDodge,
-  addMagicAttack,
-  addMagicDefense,
-  addObservation,
-  addDiscretion,
+  improve,
 } from './evolutionSlice';
 import { Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -87,43 +76,43 @@ export function Evolution() {
                 label="FOR"
                 value={character.profile.strength}
                 xp={experience.strength}
-                onIncrement={() => dispatch(addStrength(1))}
-                onDecrement={() => dispatch(addStrength(-1))}
+                onIncrement={() => dispatch(improve({ strength: 1}))}
+                onDecrement={() => dispatch(improve({ strength: -1}))}
               />
               <DisplayAttribute
                 label="DEX"
                 value={character.profile.dexterity}
                 xp={experience.dexterity}
-                onIncrement={() => dispatch(addDexterity(1))}
-                onDecrement={() => dispatch(addDexterity(-1))}
+                onIncrement={() => dispatch(improve({ dexterity: 1}))}
+                onDecrement={() => dispatch(improve({ dexterity: -1}))}
               />
               <DisplayAttribute
                 label="INT"
                 value={character.profile.intelligence}
                 xp={experience.intelligence}
-                onIncrement={() => dispatch(addIntelligence(1))}
-                onDecrement={() => dispatch(addIntelligence(-1))}
+                onIncrement={() => dispatch(improve({ intelligence: 1}))}
+                onDecrement={() => dispatch(improve({ intelligence: -1}))}
               />
               <DisplayAttribute
                 label="CON"
                 value={character.profile.constitution}
                 xp={experience.constitution}
-                onIncrement={() => dispatch(addConsitution(1))}
-                onDecrement={() => dispatch(addConsitution(-1))}
+                onIncrement={() => dispatch(improve({ constitution: 1}))}
+                onDecrement={() => dispatch(improve({ constitution: -1}))}
               />
               <DisplayAttribute
                 label="ESP"
                 value={character.profile.mind}
                 xp={experience.mind}
-                onIncrement={() => dispatch(addMind(1))}
-                onDecrement={() => dispatch(addMind(-1))}
+                onIncrement={() => dispatch(improve({ mind: 1}))}
+                onDecrement={() => dispatch(improve({ mind: -1}))}
               />
               <DisplayAttribute
                 label="CHA"
                 value={character.profile.charisma}
                 xp={experience.charisma}
-                onIncrement={() => dispatch(addCharisma(1))}
-                onDecrement={() => dispatch(addCharisma(-1))}
+                onIncrement={() => dispatch(improve({ charisma: 1}))}
+                onDecrement={() => dispatch(improve({ charisma: -1}))}
               />
             </Container>
           </CardBody>
@@ -136,48 +125,48 @@ export function Evolution() {
                 value={character.profile.accuracy}
                 xp={experience.accuracy}
                 unity="%"
-                onIncrement={() => dispatch(addAccuracy(1))}
-                onDecrement={() => dispatch(addAccuracy(-1))}
+                onIncrement={() => dispatch(improve({ accuracy: 1}))}
+                onDecrement={() => dispatch(improve({ accuracy: -1}))}
               />
               <DisplayAttribute
                 label="ESQ"
                 value={character.profile.dodge}
                 xp={experience.dodge}
                 unity="%"
-                onIncrement={() => dispatch(addDodge(1))}
-                onDecrement={() => dispatch(addDodge(-1))}
+                onIncrement={() => dispatch(improve({ dodge: 1}))}
+                onDecrement={() => dispatch(improve({ dodge: -1}))}
               />
               <DisplayAttribute
                 label="MM"
                 value={character.profile.magicAttack}
                 xp={experience.magicAttack}
                 unity="%"
-                onIncrement={() => dispatch(addMagicAttack(1))}
-                onDecrement={() => dispatch(addMagicAttack(-1))}
+                onIncrement={() => dispatch(improve({ magicAttack: 1}))}
+                onDecrement={() => dispatch(improve({ magicAttack: -1}))}
               />
               <DisplayAttribute
                 label="DM"
                 value={character.profile.magicDefense}
                 xp={experience.magicDefense}
                 unity="%"
-                onIncrement={() => dispatch(addMagicDefense(1))}
-                onDecrement={() => dispatch(addMagicDefense(-1))}
+                onIncrement={() => dispatch(improve({ magicDefense: 1}))}
+                onDecrement={() => dispatch(improve({ magicDefense: -1}))}
               />
               <DisplayAttribute
                 label="OBS"
                 value={character.profile.observation}
                 xp={experience.observation}
                 unity="%"
-                onIncrement={() => dispatch(addObservation(1))}
-                onDecrement={() => dispatch(addObservation(-1))}
+                onIncrement={() => dispatch(improve({ observation: 1}))}
+                onDecrement={() => dispatch(improve({ observation: -1}))}
               />
               <DisplayAttribute
                 label="DIS"
                 value={character.profile.discretion}
                 xp={experience.discretion}
                 unity="%"
-                onIncrement={() => dispatch(addDiscretion(1))}
-                onDecrement={() => dispatch(addDiscretion(-1))}
+                onIncrement={() => dispatch(improve({ discretion: 1}))}
+                onDecrement={() => dispatch(improve({ discretion: -1}))}
               />
             </Container>
           </CardBody>

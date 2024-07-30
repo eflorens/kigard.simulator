@@ -11,19 +11,19 @@ export function DisplayBreed() {
 
   return (
     <Row>
-        <Col>
-          <DropdownList<Breed>
-            source={Breeds}
-            title="label"
-            value={Breeds.find(b => b.id === breed)}
-            onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))} />
-        </Col>
-        <Col className="text-center">
-          {character.breed.gifts.map((gift) => (<DisplayGift key={gift} id={gift} />))}
-        </Col>
-        <Col className="text-end">
-          <Badge pill>{experience.total} PE</Badge>
-        </Col>
+      <Col>
+        <DropdownList<Breed>
+          source={Breeds}
+          title="label"
+          value={Breeds.find(b => b.id === breed)}
+          onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))} />
+      </Col>
+      <Col className="text-center">
+        {character.breed.gifts.map((gift) => (<DisplayGift key={gift} id={gift} />))}
+      </Col>
+      <Col className="text-end">
+        <Badge pill>{experience.total} PE</Badge>
+      </Col>
     </Row>
   );
 
