@@ -5,6 +5,12 @@ import { BreedId } from "../../data/character";
 import { Item, Weapon } from "../../data/inventory";
 import { RootState } from "../../app/store";
 
+export enum Tabs {
+  Evolution = 1,
+  Inventory = 2,
+  Summary = 3,
+}
+
 export interface Simulator {
   breed: BreedId,
   improvements: Improvements,
@@ -20,27 +26,35 @@ interface Store {
   simulators: Backup[];
 }
 
+interface SaveState {
+  store: Store;
+  activeTab: Tabs;
+}
+
 const loadStore = () => {
   const local = localStorage.getItem("store");
   return (local && JSON.parse(local) as Store) || { simulators: [] };
 }
 export const saveSlice = createSlice({
   name: "save",
-  initialState: loadStore(),
+  initialState: { store: loadStore(), activeTab: Tabs.Evolution } as SaveState,
   reducers: {
+    setActiveTab(state, action: PayloadAction<Tabs>) {
+      state.activeTab = action.payload;
+    },
     saveBackup(state, action: PayloadAction<Backup>) {
       const store = {
         simulators: [...loadStore().simulators.filter(s => s.name !== action.payload.name), action.payload]
       };
       localStorage.setItem("store", JSON.stringify(store));
-      state.simulators = store.simulators;
+      state.store.simulators = store.simulators;
     },
     removeBackup(state, action: PayloadAction<string>) {
       const store = {
         simulators: [...loadStore().simulators.filter(s => s.name !== action.payload)]
       };
       localStorage.setItem("store", JSON.stringify(store));
-      state.simulators = store.simulators;
+      state.store.simulators = store.simulators;
     }
   }
 });
@@ -102,10 +116,12 @@ export const selectCurrent = createSelector([selectEvolution, selectInventory], 
 });
 
 export const {
+  setActiveTab,
   saveBackup,
   removeBackup,
 } = saveSlice.actions;
 
-export const selectStore = (state: RootState) => state.store;
+export const selectStore = (state: RootState) => state.save.store;
+export const selectTab = (state: RootState) => state.save.activeTab;
 
 export default saveSlice.reducer;

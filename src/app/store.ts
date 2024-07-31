@@ -9,7 +9,7 @@ export const store = configureStore({
     evolution: evolutionReducer,
     inventory: inventoryReducer,
     toast: toastReducer,
-    store: saveReducer,
+    save: saveReducer,
   },
 });
 

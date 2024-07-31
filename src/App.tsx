@@ -3,10 +3,11 @@ import { Container } from 'reactstrap';
 import { Layout, Nav, NavItem, NavLink, TabContent, TabPane } from "./components";
 import { Evolution } from "./features/evolution/Evolution";
 import { Inventory } from "./features/inventory/Inventory";
-import { useState } from "react";
 import { Summary } from "./features/summary/Summary";
 import { DisplayBreed } from './features/evolution/DisplayBreed';
 import ToastContainer from './features/toastr/ToastContainer';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { selectTab, setActiveTab } from './features/save/saveSlice';
 
 enum Tabs {
   Evolution = 1,
@@ -15,23 +16,27 @@ enum Tabs {
 }
 
 function Toolbox() {
-  const [open, setOpen] = useState(Tabs.Evolution);
+  const dispatch = useAppDispatch();
+  const activeTab = useAppSelector(selectTab);
+  const setActive = (tab: Tabs) => {
+    dispatch(setActiveTab(tab));
+  }
 
   return (
     <>
       <ToastContainer />
       <Nav pills >
-        <NavItem active={open === Tabs.Evolution} onClick={() => setOpen(Tabs.Evolution)}>
-          <NavLink active={open === Tabs.Evolution} href='#'>Evolution</NavLink>
+        <NavItem active={activeTab === Tabs.Evolution} onClick={() => setActive(Tabs.Evolution)}>
+          <NavLink active={activeTab === Tabs.Evolution} href='#'>Evolution</NavLink>
         </NavItem>
-        <NavItem active={open === Tabs.Inventory} onClick={() => setOpen(Tabs.Inventory)}>
-          <NavLink active={open === Tabs.Inventory} href='#'>Equipement</NavLink>
+        <NavItem active={activeTab === Tabs.Inventory} onClick={() => setActive(Tabs.Inventory)}>
+          <NavLink active={activeTab === Tabs.Inventory} href='#'>Equipement</NavLink>
         </NavItem>
-        <NavItem active={open === Tabs.Summary} onClick={() => setOpen(Tabs.Summary)}>
-          <NavLink active={open === Tabs.Summary} href='#'>Résumé</NavLink>
+        <NavItem active={activeTab === Tabs.Summary} onClick={() => setActive(Tabs.Summary)}>
+          <NavLink active={activeTab === Tabs.Summary} href='#'>Résumé</NavLink>
         </NavItem>
       </Nav>
-      <TabContent activeTab={open}>
+      <TabContent activeTab={activeTab}>
         <TabPane tabId={Tabs.Evolution}>
           <Evolution />
         </TabPane>
@@ -58,3 +63,4 @@ function App() {
 }
 
 export default App;
+

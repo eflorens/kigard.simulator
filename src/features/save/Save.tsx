@@ -4,7 +4,7 @@ import { faCopy, faGear, faRemove, faSave, faUpload } from "@fortawesome/free-so
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { setToast } from "../toastr/toastSlice";
-import { removeBackup, saveBackup, selectCurrent, selectStore, Simulator } from "./saveSlice";
+import { removeBackup, saveBackup, selectCurrent, selectStore, setActiveTab, Simulator, Tabs } from "./saveSlice";
 import { setBreed, improve } from "../evolution/evolutionSlice";
 import { load } from "../inventory/inventorySlice";
 import { SizeProp } from "@fortawesome/fontawesome-svg-core";
@@ -148,6 +148,8 @@ export function SavePanelButton() {
     if (simulator.inventory) {
       dispatch(load(simulator.inventory));
     }
+
+    dispatch(setActiveTab(Tabs.Summary))
 
     dispatch(setToast({
       detail: "Simulation chargée",
