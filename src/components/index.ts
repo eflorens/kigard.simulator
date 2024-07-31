@@ -1,16 +1,20 @@
+import { Alert } from "./Alert";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
 import { Card, CardBody, CardHeader, CardColumns, CardGroup } from "./Card";
 import { Container, Row, Col } from "./Container";
 import { DropdownList } from "./DropdownList";
-import { Layout } from "./Layout";
+import { Input } from "./Input";
+import { Layout } from "../Layout";
 import { Nav, NavItem, NavLink } from "./Nav";
 import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
+import { Offcanvas, OffcanvasBody, OffcanvasHeader } from "./Offcanvas";
 import { Progress } from "./Progress";
 import { TabContent, TabPane } from "./TabContent";
 import { Tooltip } from "./Tooltip";
 
 export {
+    Alert,
     Badge,
     Button,
     Card,
@@ -22,6 +26,7 @@ export {
     Row,
     Col,
     DropdownList,
+    Input,
     Layout,
     Nav,
     NavItem,
@@ -29,6 +34,9 @@ export {
     Navbar,
     NavbarBrand,
     NavbarText,
+    Offcanvas,
+    OffcanvasBody,
+    OffcanvasHeader,
     Progress,
     TabContent,
     TabPane,

@@ -6,7 +6,7 @@ import { Inventory } from "./features/inventory/Inventory";
 import { useState } from "react";
 import { Summary } from "./features/summary/Summary";
 import { DisplayBreed } from './features/evolution/DisplayBreed';
-import { Share } from './features/share/Share';
+import ToastContainer from './features/toastr/ToastContainer';
 
 enum Tabs {
   Evolution = 1,
@@ -19,6 +19,7 @@ function Toolbox() {
 
   return (
     <>
+      <ToastContainer />
       <Nav pills >
         <NavItem active={open === Tabs.Evolution} onClick={() => setOpen(Tabs.Evolution)}>
           <NavLink active={open === Tabs.Evolution} href='#'>Evolution</NavLink>
@@ -29,7 +30,6 @@ function Toolbox() {
         <NavItem active={open === Tabs.Summary} onClick={() => setOpen(Tabs.Summary)}>
           <NavLink active={open === Tabs.Summary} href='#'>Résumé</NavLink>
         </NavItem>
-        <NavItem><NavLink><Share /></NavLink></NavItem>
       </Nav>
       <TabContent activeTab={open}>
         <TabPane tabId={Tabs.Evolution}>

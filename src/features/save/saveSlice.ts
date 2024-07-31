@@ -1,8 +1,9 @@
-import { createSelector } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Improvements, selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, OneItemPerHand, selectInventory, ShareInventory } from "../inventory/inventorySlice";
 import { BreedId } from "../../data/character";
 import { Item, Weapon } from "../../data/inventory";
+import { RootState } from "../../app/store";
 
 export interface Simulator {
   breed: BreedId,
@@ -10,7 +11,41 @@ export interface Simulator {
   inventory: ShareInventory,
 }
 
-export const selectShare = createSelector([selectEvolution, selectInventory], ({ breed, experience }, inventory) => {
+interface Backup {
+  name: string,
+  simulator: Simulator
+}
+
+interface Store {
+  simulators: Backup[];
+}
+
+const loadStore = () => {
+  const local = localStorage.getItem("store");
+  return (local && JSON.parse(local) as Store) || { simulators: [] };
+}
+export const saveSlice = createSlice({
+  name: "save",
+  initialState: loadStore(),
+  reducers: {
+    saveBackup(state, action: PayloadAction<Backup>) {
+      const store = {
+        simulators: [...loadStore().simulators.filter(s => s.name !== action.payload.name), action.payload]
+      };
+      localStorage.setItem("store", JSON.stringify(store));
+      state.simulators = store.simulators;
+    },
+    removeBackup(state, action: PayloadAction<string>) {
+      const store = {
+        simulators: [...loadStore().simulators.filter(s => s.name !== action.payload)]
+      };
+      localStorage.setItem("store", JSON.stringify(store));
+      state.simulators = store.simulators;
+    }
+  }
+});
+
+export const selectCurrent = createSelector([selectEvolution, selectInventory], ({ breed, experience }, inventory) => {
 
   const share = ({ enchantment, item, settings }: Inventory<Item | Weapon>) => {
     if (!item) {
@@ -63,7 +98,14 @@ export const selectShare = createSelector([selectEvolution, selectInventory], ({
     }
   };
 
-  console.log(simulator);
-
   return simulator;
 });
+
+export const {
+  saveBackup,
+  removeBackup,
+} = saveSlice.actions;
+
+export const selectStore = (state: RootState) => state.store;
+
+export default saveSlice.reducer;
