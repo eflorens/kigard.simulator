@@ -8,6 +8,7 @@ import {
 import { Col, Container, Row, Tooltip, Button, CardGroup, Card, CardBody } from '../../components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { DisplayBreed } from './DisplayBreed';
 
 interface DisplayAttributeProps {
   label: string;
@@ -68,6 +69,7 @@ export function Evolution() {
 
   return (
     <>
+      <h4><DisplayBreed /></h4>
       <CardGroup>
         <Card>
           <CardBody>

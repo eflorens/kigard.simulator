@@ -1,13 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container } from 'reactstrap';
-import { Layout, Nav, NavItem, NavLink, TabContent, TabPane } from "./components";
+import { Container, Nav, NavItem, NavLink, TabContent, TabPane } from "./components";
 import { Evolution } from "./features/evolution/Evolution";
 import { Inventory } from "./features/inventory/Inventory";
 import { Summary } from "./features/summary/Summary";
-import { DisplayBreed } from './features/evolution/DisplayBreed';
 import ToastContainer from './features/toastr/ToastContainer';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { selectTab, setActiveTab } from './features/save/saveSlice';
+import { Layout } from './Layout';
 
 enum Tabs {
   Evolution = 1,
@@ -55,7 +54,6 @@ function App() {
   return (
     <Layout>
       <Container>
-        <DisplayBreed />
         <Toolbox />
       </Container>
     </Layout>

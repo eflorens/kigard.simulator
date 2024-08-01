@@ -170,7 +170,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
   const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon) || (inventory.hands as Inventory<Weapon>)?.item;
   const primaryWeapon = weapon && {
     ...weapon,
-    damage: (weapon.range && weapon.range.min > 1 ? summary.dexterity : summary.strength) + (weapon.damage || 0),
+    damage: (weapon.range && weapon.range.max > 1 ? summary.dexterity : summary.strength) + (weapon.damage || 0),
     accuracy: summary.accuracy + (weapon?.accuracy || 0),
   };
 
@@ -181,7 +181,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength)
       + (leftWeapon.damage || 0)
       + ((isLeftHand && 2) || 0),
-    accuracy: summary.accuracy + (weapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
+    accuracy: summary.accuracy + (leftWeapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
   };
 
   return {

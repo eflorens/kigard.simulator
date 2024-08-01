@@ -9,7 +9,7 @@ export function DisplayGift({ id }: Readonly<{ id: GiftId; }>) {
   }
 
   return (
-    <Badge pill color="primary" className="mx-1">
+    <Badge pill className="mx-1">
       <Tooltip description={gift.description}>
         {gift.label}
       </Tooltip>

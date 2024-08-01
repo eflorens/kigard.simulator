@@ -5,7 +5,6 @@ import { Card, CardBody, CardHeader, CardColumns, CardGroup } from "./Card";
 import { Container, Row, Col } from "./Container";
 import { DropdownList } from "./DropdownList";
 import { Input } from "./Input";
-import { Layout } from "../Layout";
 import { Nav, NavItem, NavLink } from "./Nav";
 import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
 import { Offcanvas, OffcanvasBody, OffcanvasHeader } from "./Offcanvas";
@@ -27,7 +26,6 @@ export {
     Col,
     DropdownList,
     Input,
-    Layout,
     Nav,
     NavItem,
     NavLink,

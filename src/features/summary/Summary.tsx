@@ -8,6 +8,7 @@ import { DisplayElementaryResistance } from '../../components/DisplayElementaryR
 import { DisplayElement } from '../../components/DisplayElement';
 import { DisplayStatus } from '../../components/DisplayStatus';
 import { DisplayItemImage } from '../../components/DisplayItemImage';
+import { DisplayBreed } from '../evolution/DisplayBreed';
 
 interface AttributeProps {
   label: string;
@@ -132,6 +133,7 @@ export function Summary() {
 
   return (
     <>
+      <h4><DisplayBreed readonly /></h4>
       <CardGroup>
         <Card>
           <CardHeader>Attributs</CardHeader>

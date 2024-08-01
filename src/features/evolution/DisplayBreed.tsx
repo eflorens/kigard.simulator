@@ -5,24 +5,25 @@ import { DisplayGift } from '../../components/DisplayGift';
 import { selectEvolution, setBreed } from "./evolutionSlice";
 
 
-export function DisplayBreed() {
+export function DisplayBreed({ readonly }: { readonly?: boolean }) {
   const { character, experience, breed } = useAppSelector(selectEvolution);
   const dispatch = useAppDispatch();
 
   return (
     <Row>
       <Col>
-        <DropdownList<Breed>
+        {!readonly && <DropdownList<Breed>
           source={Breeds}
           title="label"
           value={Breeds.find(b => b.id === breed)}
-          onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))} />
+          onChange={breed => dispatch(setBreed(breed?.id || Breeds[0].id))} />}
+        {readonly && <Badge color="primary" pill>{Breeds.find(b => b.id === breed)?.label}</Badge>}
       </Col>
-      <Col className="text-center">
+      <Col xs="5" md="8" className="text-center">
         {character.breed.gifts.map((gift) => (<DisplayGift key={gift} id={gift} />))}
       </Col>
       <Col className="text-end">
-        <Badge pill>{experience.total} PE</Badge>
+        <Badge pill color="primary">{experience.total} PE</Badge>
       </Col>
     </Row>
   );

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Badge, Col, Container, Input, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Tooltip } from "../../components";
-import { faCopy, faGear, faRemove, faSave, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsRotate, faCopy, faGear, faRemove, faSave, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { setToast } from "../toastr/toastSlice";
@@ -8,6 +8,7 @@ import { removeBackup, saveBackup, selectCurrent, selectStore, setActiveTab, Sim
 import { setBreed, improve } from "../evolution/evolutionSlice";
 import { load } from "../inventory/inventorySlice";
 import { SizeProp } from "@fortawesome/fontawesome-svg-core";
+import { BreedId } from "../../data/character";
 
 interface BackupProps {
   name: string;
@@ -139,6 +140,17 @@ export function SavePanelButton() {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
 
+  const reset = useCallback(() => {
+    dispatch(setBreed(BreedId.HUMAN));
+    dispatch(load({}));
+    dispatch(setActiveTab(Tabs.Evolution));
+
+    dispatch(setToast({
+      detail: "Simulation réinitialisée",
+      status: "success",
+    }));
+  }, [dispatch])
+
   const loadSimulator = useCallback((simulator: Simulator) => {
     dispatch(setBreed(simulator.breed));
 
@@ -170,6 +182,13 @@ export function SavePanelButton() {
 
   return (
     <Row>
+      <Col>
+        <Tooltip description="Réintialiser">
+          <Badge role="button" pill onClick={reset}>
+            <FontAwesomeIcon size="2x" icon={faArrowsRotate} />
+          </Badge>
+        </Tooltip>
+      </Col>
       <Col>
         <ShareButton size="2x" simulator={current} />
       </Col>
