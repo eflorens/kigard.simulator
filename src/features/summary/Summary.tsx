@@ -9,6 +9,7 @@ import { DisplayElement } from '../../components/DisplayElement';
 import { DisplayStatus } from '../../components/DisplayStatus';
 import { DisplayItemImage } from '../../components/DisplayItemImage';
 import { DisplayBreed } from '../evolution/DisplayBreed';
+import { DisplayTalent } from '../talents/DisplayTalent';
 
 interface AttributeProps {
   label: string;
@@ -129,7 +130,8 @@ function DisplayWeapons() {
 
 export function Summary() {
 
-  const { primaryWeapon, secondaryWeapon, ...summary } = useAppSelector(selectSummary);
+  const summary = useAppSelector(selectSummary);
+  const { talents } = summary;
 
   return (
     <>
@@ -176,7 +178,7 @@ export function Summary() {
           <CardHeader>
             <span>Combat & Magie</span>
             <Badge pill color="secondary" className='float-end'>PM {summary.magicRecovery > 0 && "+"}{summary.magicRecovery}</Badge>
-            {!!summary.actionPointBonus && <Badge pill color="secondary" className='float-end'>PA {summary.actionPointBonus > 0 && "+"}{summary.actionPointBonus}%</Badge>}
+            {!!summary.actionPointsBonus && <Badge pill color="secondary" className='float-end'>PA {summary.actionPointsBonus > 0 && "+"}{summary.actionPointsBonus}%</Badge>}
             {!!summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
           </CardHeader>
           <CardBody>
@@ -212,6 +214,11 @@ export function Summary() {
           </CardBody>
         </Card>
       </CardGroup>
+      <Row className="row-cols-1 row-cols-md-2">
+        {talents.map(talent => (
+          <Col key={talent.id.toString()}><DisplayTalent summary={summary} {...talent} /></Col>
+        ))}
+      </Row>
     </>
   );
 }

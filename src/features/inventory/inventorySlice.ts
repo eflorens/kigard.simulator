@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { allEnchantments, allSettings, bust, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
+import { allEnchantments, allSettings, bust, feet, fetish, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
 import { magicScrolls, Talent } from '../../data/talents';
 
 interface ShareItem {
@@ -93,8 +93,8 @@ const inventorySlice = createSlice({
     load(state, action: PayloadAction<ShareInventory>) {
       state.head = loadItem(head, action.payload.head);
       state.bust = loadItem(bust, action.payload.bust);
-      state.feet = loadItem(head, action.payload.feet);
-      state.fetish = loadItem(head, action.payload.fetish);
+      state.feet = loadItem(feet, action.payload.feet);
+      state.fetish = loadItem(fetish, action.payload.fetish);
       if (!!action.payload.hands) {
         state.hands = loadItem(twoHands, action.payload.hands);
       }

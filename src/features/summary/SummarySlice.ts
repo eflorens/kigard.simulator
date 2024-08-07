@@ -3,6 +3,7 @@ import { selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
+import { Talent } from "../../data/talents";
 
 interface Attributes {
   strength: number;
@@ -23,6 +24,20 @@ interface Attributes {
   magicPower: number;
   actionPointsBonus: number;
   regeneration: number;
+}
+
+export interface SummaryState extends Attributes {
+  elementaryResistances: { value: number, element: ElementId }[];
+  empathie: number;
+  memory: number;
+  mana: number;
+  vitality: number;
+  magicRecovery: number;
+  actionPointsBonus: number;
+  regeneration: number;
+  primaryWeapon: Weapon;
+  secondaryWeapon: Weapon;
+  talents: Talent[];
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
@@ -158,17 +173,21 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     magicResistance: evolution.character.profile.magicResistance + total.magicResistance,
     magicPower: evolution.character.profile.magicPower + total.magicPower,
     magicRecovery: evolution.character.profile.magicRecovery,
-    actionPointBonus: evolution.character.profile.actionPointBonus + total.actionPointsBonus,
+    actionPointsBonus: evolution.character.profile.actionPointBonus + total.actionPointsBonus,
     regeneration,
     elementaryResistances,
     empathie: Math.floor((evolution.character.profile.charisma + total.charisma) / 5),
     memory: Math.floor((evolution.character.profile.mind + total.mind) / 5),
     mana: (evolution.character.profile.mind + total.mind) * 2,
     vitality: (evolution.character.profile.constitution + total.constitution) * 10,
+    talents: [
+      ...Object.entries(inventory?.magicScrolls.rightHand).map((scroll) => scroll[1]),
+      ...Object.entries(inventory?.magicScrolls.leftHand).map((scroll) => scroll[1]),
+    ],
   };
 
   const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon) || (inventory.hands as Inventory<Weapon>)?.item;
-  const primaryWeapon = weapon && {
+  const primaryWeapon: Weapon = weapon && {
     ...weapon,
     damage: (weapon.range && weapon.range.max > 1 ? summary.dexterity : summary.strength) + (weapon.damage || 0),
     accuracy: summary.accuracy + (weapon?.accuracy || 0),
@@ -176,7 +195,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
 
   const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon;
   const isLeftHand = leftWeapon?.id === 311;
-  const secondaryWeapon = leftWeapon && {
+  const secondaryWeapon: Weapon = leftWeapon && {
     ...leftWeapon,
     damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength)
       + (leftWeapon.damage || 0)
@@ -188,5 +207,5 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     ...summary,
     primaryWeapon,
     secondaryWeapon,
-  }
+  } as SummaryState;
 });

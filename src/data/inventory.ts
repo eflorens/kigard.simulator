@@ -1,11 +1,87 @@
 export enum Status {
   Stunned = 1,
+  Restrained = 2,
   Piercing = 3,
   Poisoned = 4,
+  Force = 8,
   Necrosis = 9,
+  Regeneration = 11,
+  Endurance = 12,
+  Furtivity = 13,
   Burning = 16,
-  Bleeding = 17
+  Bleeding = 17,
+  Aegis = 19,
+  Terror = 20,
+  Immunity = 21,
+  Hability = 22,
+  Vivacious = 23,
+  Exalted = 30,
+  Bewitched = 31,
+  Freeze = 39,
+  Will = 40,
 }
+
+export const allStatus = [{
+  id: Status.Stunned,
+  name: "Assomé"
+}, {
+  id: Status.Restrained,
+  name: "Entravé"
+}, {
+  id: Status.Piercing,
+  name: "Faille"
+}, {
+  id: Status.Poisoned,
+  name: "Poison"
+}, {
+  id: Status.Force,
+  name: "Force"
+}, {
+  id: Status.Necrosis,
+  name: "Nécrose"
+}, {
+  id: Status.Regeneration,
+  name: "Régénération"
+}, {
+  id: Status.Endurance,
+  name: "Endurance"
+}, {
+  id: Status.Furtivity,
+  name: "Furtif"
+}, {
+  id: Status.Burning,
+  name: "Brûlure"
+}, {
+  id: Status.Bleeding,
+  name: "Saignement"
+}, {
+  id: Status.Aegis,
+  name: "Egide"
+}, {
+  id: Status.Terror,
+  name: "Terreur"
+}, {
+  id: Status.Immunity,
+  name: "Immunité"
+}, {
+  id: Status.Hability,
+  name: "Habile"
+}, {
+  id: Status.Vivacious,
+  name: "Vivace"
+}, {
+  id: Status.Exalted,
+  name: "Exalté"
+}, {
+  id: Status.Bewitched,
+  name: "Envoûté"
+}, {
+  id: Status.Freeze,
+  name: "Gel"
+}, {
+  id: Status.Will,
+  name: "Volonté"
+}];
 
 export enum ElementId {
   Fire = 1,
@@ -17,6 +93,32 @@ export enum ElementId {
   Earth = 7,
   Wind = 8,
 }
+
+export const allElements = [{
+  id: ElementId.Fire,
+  name: "Feu"
+}, {
+  id: ElementId.Ice,
+  name: "Glace"
+}, {
+  id: ElementId.Thunder,
+  name: "Foudre"
+}, {
+  id: ElementId.Light,
+  name: "Lumière"
+}, {
+  id: ElementId.Dark,
+  name: "Ténèbres"
+}, {
+  id: ElementId.Water,
+  name: "Eau"
+}, {
+  id: ElementId.Earth,
+  name: "Terre"
+}, {
+  id: ElementId.Wind,
+  name: "Vent"
+}]
 
 export interface ItemStatus {
   value: number;
@@ -121,7 +223,7 @@ export interface Item extends Attributes {
 
 export interface Weapon extends Item {
   usageCost: number;
-  range?: {min: number, max: number};
+  range?: { min: number, max: number };
   element?: ElementId;
   elementaryAffinity?: ElementId;
 }
@@ -722,14 +824,14 @@ const oneHandWeapon: Weapon[] = [{
   name: 'Fouet',
   weight: 2,
   usageCost: 4,
-  range: {min: 1, max: 2},
+  range: { min: 1, max: 2 },
   damage: 2,
 }, {
   id: 151,
   name: 'Magifouet',
   weight: 2,
   usageCost: 5,
-  range: {min: 1, max: 2},
+  range: { min: 1, max: 2 },
   damage: 4,
   magicPower: 2,
 }, {
@@ -737,7 +839,7 @@ const oneHandWeapon: Weapon[] = [{
   name: 'Fouet-lame',
   weight: 2,
   usageCost: 5,
-  range: {min: 1, max: 2},
+  range: { min: 1, max: 2 },
   damage: 6,
 }, {
   id: 292,
@@ -858,7 +960,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 4,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 4,
 }, {
   id: 127,
@@ -867,7 +969,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 4,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 5,
 }, {
   id: 79,
@@ -876,7 +978,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 6,
   accuracy: 15,
 }, {
@@ -886,7 +988,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 9,
 }, {
   id: 230,
@@ -895,7 +997,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 4,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 4,
   dexterity: 2
 }, {
@@ -905,7 +1007,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 6,
   element: ElementId.Light,
   intelligence: 2,
@@ -916,7 +1018,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 7,
   status: [{
     value: 1,
@@ -929,7 +1031,7 @@ const twoHands: Weapon[] = [{
   doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 7,
   status: [{
     value: 1,
@@ -941,7 +1043,7 @@ const twoHands: Weapon[] = [{
   weight: 3,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 7,
 }, {
   id: 326,
@@ -949,7 +1051,7 @@ const twoHands: Weapon[] = [{
   weight: 3,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 4},
+  range: { min: 2, max: 4 },
   damage: 4,
   accuracy: 10,
 }, {
@@ -958,7 +1060,7 @@ const twoHands: Weapon[] = [{
   weight: 3,
   enhancedEnchantment: true,
   usageCost: 5,
-  range: {min: 2, max: 3},
+  range: { min: 2, max: 3 },
   damage: 9,
 }, {
   id: 108,
@@ -1334,5 +1436,5 @@ const fetish: Item[] = [{
   magicResistance: 1,
 }];
 
-const hand: (Item | Weapon)[] = [ ...oneHandWeapon, ...oneHand];
+const hand: (Item | Weapon)[] = [...oneHandWeapon, ...oneHand];
 export { head, bust, hand, twoHands, feet, fetish };

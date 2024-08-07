@@ -10,6 +10,7 @@ import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
 import { Offcanvas, OffcanvasBody, OffcanvasHeader } from "./Offcanvas";
 import { Progress } from "./Progress";
 import { TabContent, TabPane } from "./TabContent";
+import { Bold, Italic, Underline } from "./Text";
 import { Tooltip } from "./Tooltip";
 
 export {
@@ -38,5 +39,8 @@ export {
     Progress,
     TabContent,
     TabPane,
+    Bold,
+    Italic,
+    Underline,
     Tooltip
 };
