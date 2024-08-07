@@ -122,6 +122,7 @@ function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSe
                 onChange={onChange}
                 value={current?.item}
                 description={label}
+                search
               />
             </Col>
             {current?.item?.magicalSpace && current.item.magicalSpace > 0 && (
@@ -136,6 +137,7 @@ function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSe
                     size="sm"
                     value={currentMagicScrolls && magicScrolls.find(scroll => scroll.id === currentMagicScrolls[i])}
                     description="Aucun parchemin"
+                    search
                   />
                 </Col>
               )))}

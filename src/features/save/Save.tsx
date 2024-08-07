@@ -121,7 +121,7 @@ export function Save({ loadSimulator }: { loadSimulator: (simulator: Simulator) 
     <Container>
       <Row>
         <Col>
-          <Input type="text" value={currentName} onChange={e => setCurrentName(e.target.value)} placeholder="Nom de la sauvegarde" />
+          <Input type="text" name="name" autoComplete="off" value={currentName} onChange={e => setCurrentName(e.target.value)} placeholder="Nom de la sauvegarde" />
         </Col>
         <Col xs="1" className="text-center">
           <Tooltip description="Sauvegarder">
