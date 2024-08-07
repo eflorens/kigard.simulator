@@ -430,7 +430,7 @@ const magicScrolls: Talent[] = [{
   usageCost: 4,
   range: { min: 0, max: 3 },
   getDescription: (summary) => (
-    <span>Soigne <Bold>{getMagicPower(summary) / 5} PV</Bold></span>
+    <span>Soigne <Bold>{getMagicPower(summary)} PV</Bold></span>
   )
 }, {
   id: MagicScrollId.Instinct,
