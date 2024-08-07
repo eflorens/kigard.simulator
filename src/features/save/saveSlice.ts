@@ -103,10 +103,10 @@ export const selectCurrent = createSelector([selectEvolution, selectInventory], 
       fetish: (inventory?.fetish && share(inventory.fetish)) || undefined,
       magicScrolls: {
         rightHand: Object.entries(inventory?.magicScrolls.rightHand)
-          .map((scroll) => scroll[1]?.id)
+          .map((scroll) => scroll[1])
           .filter(scroll => !!scroll),
         leftHand: Object.entries(inventory?.magicScrolls.leftHand)
-          .map((scroll) => scroll[1]?.id)
+          .map((scroll) => scroll[1])
           .filter(scroll => !!scroll),
       }
     }

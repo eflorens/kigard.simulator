@@ -1,10 +1,11 @@
 import { Alert } from "./Alert";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
-import { Card, CardBody, CardHeader, CardColumns, CardGroup } from "./Card";
+import { Card, CardBody, CardHeader, CardColumns, CardGroup, CardSubtitle, CardTitle } from "./Card";
 import { Container, Row, Col } from "./Container";
 import { DropdownList } from "./DropdownList";
 import { Input } from "./Input";
+import { ListGroup, ListGroupItem } from "./ListGroup";
 import { Nav, NavItem, NavLink } from "./Nav";
 import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
 import { Offcanvas, OffcanvasBody, OffcanvasHeader } from "./Offcanvas";
@@ -20,6 +21,8 @@ export {
     Card,
     CardBody,
     CardHeader,
+    CardTitle,
+    CardSubtitle,
     CardColumns,
     CardGroup,
     Container,
@@ -27,6 +30,8 @@ export {
     Col,
     DropdownList,
     Input,
+    ListGroup,
+    ListGroupItem,
     Nav,
     NavItem,
     NavLink,

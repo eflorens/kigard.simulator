@@ -116,7 +116,6 @@ const createGnome = (): Character => {
       ...baseProfile,
       intelligence: baseProfile.intelligence + 2,
       dodge: baseProfile.dodge + 5,
-      magicRecovery: baseProfile.magicRecovery + 1,
     }
   };
 }

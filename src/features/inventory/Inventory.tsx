@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Card, CardBody, CardGroup, CardHeader, Col, DropdownList } from "../../components";
+import { Bold, Col, DropdownList, ListGroup, ListGroupItem, Row } from "../../components";
 import { bust, allEnchantments, feet, fetish, head, Item, Modifier, hand, twoHands, Weapon, allSettings } from "../../data/inventory";
 import { Inventory as InventoryItem, equipItem, equipLeftHand, equipRightHand, InventoryLocation, selectInventory, setEnchantment, setLeftHandEnchantment, setLeftHandSettings, setRightHandEnchantment, setRightHandSettings, setSettings, unequipItem, unequipLeftHand, unequipRightHand, setMagicScrolls, unsetMagicScrolls } from "./inventorySlice";
 import { DisplayElementaryResistance } from "../../components/DisplayElementaryResistance";
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { DisplayItemImage } from "../../components/DisplayItemImage";
 import { DisplayElement } from "../../components/DisplayElement";
-import { magicScrolls, Talent } from "../../data/talents";
+import { MagicScrollId, magicScrolls, Talent } from "../../data/talents";
 
 function DisplayAttributeItem({ item }: { item?: Item }) {
   if (!item) {
@@ -68,7 +68,7 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
 
 }
 
-function DisplayItem<T extends Item>({ item }: { item?: T }) {
+function DisplayItem<T extends Item>({ item, showDetails }: { item?: T, showDetails?: boolean }) {
   if (!item) {
     return <span>Aucun</span>;
   }
@@ -77,7 +77,7 @@ function DisplayItem<T extends Item>({ item }: { item?: T }) {
     <>
       <DisplayItemImage id={item.id} name={item.name} />
       <span>{item?.name}</span>
-      <DisplayAttributeItem item={item} />
+      {showDetails && <DisplayAttributeItem item={item} />}
     </>
   );
 }
@@ -90,76 +90,85 @@ interface ChooseItemProps<T extends Item> {
   onMagicScrollChange?: (index: number, scroll?: Talent) => void;
   source: T[];
   current?: InventoryItem<T>;
-  currentMagicScrolls?: { [index: number]: Talent };
+  currentMagicScrolls?: { [index: number]: MagicScrollId };
 }
 
 function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSettingsChange, onMagicScrollChange, source, current, currentMagicScrolls }: ChooseItemProps<T>) {
   return (
-    <div className="col-sm-6">
-      <Card>
-        <CardHeader>{label}</CardHeader>
-        <CardBody className="text-center">
-          <Col>
-            <DropdownList
-              hasEmpty
-              source={allEnchantments}
-              title="description"
-              onChange={onEnchantmentChange}
-              value={current?.enchantment}
-              description="Aucun enchantement"
-            />
-          </Col>
-          <Col>
-            <DropdownList
-              hasEmpty
-              source={source}
-              title="name"
-              render={item => <DisplayItem item={item} />}
-              onChange={onChange}
-              value={current?.item}
-              description="Aucun"
-            />
-          </Col>
-          {current?.item?.magicalSpace && current.item.magicalSpace > 0 && (
-            Array.from(Array(current.item.magicalSpace).keys()).map((_, i) => (
-              <Col key={i}>
-                <DropdownList
-                  hasEmpty
-                  source={magicScrolls}
-                  title="name"
-                  render={item => item && <><DisplayItemImage id={52} name={item.name} /><span>{item.name}</span></>}
-                  onChange={s => onMagicScrollChange && onMagicScrollChange(i, s)}
-                  size="sm"
-                  value={currentMagicScrolls && currentMagicScrolls[i]}
-                  description="Aucun parchemin"
-                />
-              </Col>
-            )))}
-          <Col>
-            <DropdownList
-              hasEmpty
-              source={allSettings}
-              title="description"
-              onChange={s => onSettingsChange({ first: s, second: current?.settings?.second })}
-              value={current?.settings?.first}
-              description="Aucun sertissage"
-            />
-          </Col>
-          <Col>
-            {current?.item?.doubleSetting && (
+    <ListGroupItem>
+      <Row className="text-center">
+        <Col className="text-start col-12 col-lg-2">
+          <Bold>{label}</Bold>
+        </Col>
+        <Col className="col-12 col-lg-3">
+          <DropdownList
+            hasEmpty
+            source={allEnchantments}
+            title="description"
+            onChange={onEnchantmentChange}
+            value={current?.enchantment}
+            description="Aucun enchantement"
+          />
+        </Col>
+        <Col>
+          <Row>
+            <Col>
+              <DropdownList
+                hasEmpty
+                source={source}
+                title="name"
+                render={item => <DisplayItem item={item} showDetails />}
+                renderToggle={item => <DisplayItem item={item} />}
+                onChange={onChange}
+                value={current?.item}
+                description={label}
+              />
+            </Col>
+            {current?.item?.magicalSpace && current.item.magicalSpace > 0 && (
+              Array.from(Array(current.item.magicalSpace).keys()).map((_, i) => (
+                <Col sm="12" key={i}>
+                  <DropdownList
+                    hasEmpty
+                    source={magicScrolls}
+                    title="name"
+                    render={item => item && <><DisplayItemImage id={52} name={item.name} /><span>{item.name}</span></>}
+                    onChange={s => onMagicScrollChange && onMagicScrollChange(i, s)}
+                    size="sm"
+                    value={currentMagicScrolls && magicScrolls.find(scroll => scroll.id === currentMagicScrolls[i])}
+                    description="Aucun parchemin"
+                  />
+                </Col>
+              )))}
+          </Row>
+        </Col>
+        <Col className="col-12 col-lg-3">
+          <Row>
+            <Col>
               <DropdownList
                 hasEmpty
                 source={allSettings}
                 title="description"
-                onChange={s => onSettingsChange({ first: current?.settings?.first, second: s })}
-                value={current?.settings?.second}
+                onChange={s => onSettingsChange({ first: s, second: current?.settings?.second })}
+                value={current?.settings?.first}
                 description="Aucun sertissage"
               />
+            </Col>
+            {current?.item?.doubleSetting && (
+              <Col>
+                <DropdownList
+                  hasEmpty
+                  source={allSettings}
+                  title="description"
+                  onChange={s => onSettingsChange({ first: current?.settings?.first, second: s })}
+                  value={current?.settings?.second}
+                  description="Aucun sertissage"
+                />
+              </Col>
             )}
-          </Col>
-        </CardBody>
-      </Card>
-    </div>
+          </Row>
+        </Col>
+      </Row>
+    </ListGroupItem>
   )
 }
 
@@ -167,8 +176,8 @@ export function Inventory() {
   const inventory = useSelector(selectInventory);
   const dispatch = useDispatch();
 
-  const handleMagicScrollChange = (slot: "rightHand" | "leftHand", index: number, talent?: Talent) => {
-    dispatch(talent ? setMagicScrolls({ slot, index, talent }) : unsetMagicScrolls({ slot, index }));
+  const handleMagicScrollChange = (slot: "rightHand" | "leftHand", index: number, scroll?: Talent) => {
+    dispatch(scroll ? setMagicScrolls({ slot, index, scroll: scroll?.id }) : unsetMagicScrolls({ slot, index }));
   }
 
   const handleEnchantmentChange = (slot: keyof InventoryLocation, enchantment?: Modifier) => {
@@ -208,7 +217,7 @@ export function Inventory() {
   }
 
   return (
-    <CardGroup>
+    <ListGroup>
       <ChooseItem
         label="Tête"
         onChange={item => handleItemChange('head', item)}
@@ -269,6 +278,6 @@ export function Inventory() {
         source={fetish}
         current={inventory.fetish}
       />
-    </CardGroup>
+    </ListGroup>
   );
 }

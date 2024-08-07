@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEnchantments, allSettings, bust, feet, fetish, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
-import { magicScrolls, Talent } from '../../data/talents';
+import { MagicScrollId } from '../../data/talents';
 
 interface ShareItem {
   id: number;
@@ -46,8 +46,8 @@ export interface InventoryLocation {
 
 interface InventoryState extends InventoryLocation {
   magicScrolls: {
-    rightHand: { [index: number]: Talent },
-    leftHand: { [index: number]: Talent },
+    rightHand: { [index: number]: MagicScrollId },
+    leftHand: { [index: number]: MagicScrollId },
   };
 }
 
@@ -81,9 +81,9 @@ function loadItem<T extends Item>(allItems: T[], shareItem?: ShareItem) {
 
 const loadMagicScrolls = (hand?: number[]) => {
   return hand?.map((id, index) => ({ id, index })).reduce((previous, current) => {
-    previous[current.index] = magicScrolls.find(e => e.id === current.id) as Talent;
+    previous[current.index] =current.id;
     return previous;
-  }, {} as { [index: number]: Talent }) || {};
+  }, {} as { [index: number]: MagicScrollId }) || {};
 }
 
 const inventorySlice = createSlice({
@@ -109,9 +109,9 @@ const inventorySlice = createSlice({
         };
       }
     },
-    setMagicScrolls(state, action: PayloadAction<{ index: number, slot: "rightHand" | "leftHand", talent: Talent }>) {
-      const { index, talent, slot } = action.payload;
-      state.magicScrolls[slot][index] = talent;
+    setMagicScrolls(state, action: PayloadAction<{ index: number, slot: "rightHand" | "leftHand", scroll: MagicScrollId }>) {
+      const { index, scroll, slot } = action.payload;
+      state.magicScrolls[slot][index] = scroll;
     },
     unsetMagicScrolls(state, action: PayloadAction<{ slot: "rightHand" | "leftHand", index: number }>) {
       const { index, slot } = action.payload;

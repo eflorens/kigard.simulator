@@ -5,11 +5,17 @@ import {
   CardBodyProps as CardBodyStrapProps,
   CardHeader as CardHeaderStrap,
   CardHeaderProps as CardHeaderStrapProps,
+  CardTitle as CardTitleStrap,
+  CardTitleProps as CardTitleStrapProps,
+  CardSubtitle as CardSubtitleStrap,
+  CardSubtitleProps as CardSubtitleStrapProps,
   CardColumns as CardColumnsStrap,
   CardColumnsProps as CardColumnsStrapProps,
   CardGroup as CardGroupStrap,
   CardGroupProps as CardGroupStrapProps
 } from 'reactstrap';
+
+import './Card.scss';
 
 interface CardProps extends CardStrapProps {
 
@@ -33,6 +39,22 @@ interface CardHeaderProps extends CardHeaderStrapProps {
 
 export function CardHeader(props: CardHeaderProps) {
   return <CardHeaderStrap {...props} />
+}
+
+interface CardTitleProps extends CardTitleStrapProps {
+
+}
+
+export function CardTitle(props: CardTitleProps) {
+  return <CardTitleStrap {...props} />
+}
+
+interface CardSubtitleProps extends CardSubtitleStrapProps {
+
+}
+
+export function CardSubtitle(props: CardSubtitleProps) {
+  return <CardSubtitleStrap {...props} />
 }
 
 interface CardColumnsProps extends CardColumnsStrapProps {

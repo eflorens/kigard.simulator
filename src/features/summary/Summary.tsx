@@ -1,7 +1,7 @@
 
 import { Fragment } from 'react/jsx-runtime';
 import { useAppSelector } from '../../app/hooks';
-import { Badge, Card, CardBody, CardGroup, CardHeader, Col, Container, Progress, Row } from '../../components';
+import { Badge, Bold, Card, CardBody, CardGroup, CardHeader, Col, Container, Progress, Row } from '../../components';
 import { selectSummary } from './SummarySlice';
 import { Weapon } from '../../data/inventory';
 import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
@@ -10,6 +10,7 @@ import { DisplayStatus } from '../../components/DisplayStatus';
 import { DisplayItemImage } from '../../components/DisplayItemImage';
 import { DisplayBreed } from '../evolution/DisplayBreed';
 import { DisplayTalent } from '../talents/DisplayTalent';
+import { magicScrolls } from '../../data/talents';
 
 interface AttributeProps {
   label: string;
@@ -49,6 +50,21 @@ function DisplayMana({ mana }: { mana: number }) {
       <Col><Progress value={100} color="success">{mana}</Progress></Col>
     </Row>
   );
+}
+
+function DisplayInventory(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>) {
+  const { inventory } = useAppSelector(selectSummary);
+
+  return (
+    <span {...props}>
+      {inventory.map(({ id, name }) => (
+        <span key={id} className="me-1">
+          <DisplayItemImage id={id} name={name} />
+        </span>
+      ))}
+    </span>
+  )
+
 }
 
 function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
@@ -108,7 +124,7 @@ function DisplayWeapons() {
     <>
       <Card>
         <CardHeader>
-          <span>Arme principale</span>
+          <Bold>Arme principale</Bold>
           {primaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>}
         </CardHeader>
         <CardBody>
@@ -117,7 +133,7 @@ function DisplayWeapons() {
       </Card>
       <Card>
         <CardHeader>
-          <span>Arme secondaire</span>
+          <Bold>Arme secondaire</Bold>
           {secondaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>}
         </CardHeader>
         <CardBody>
@@ -136,9 +152,12 @@ export function Summary() {
   return (
     <>
       <h4><DisplayBreed readonly /></h4>
-      <CardGroup>
+      <CardGroup className="group-col-2">
         <Card>
-          <CardHeader>Attributs</CardHeader>
+          <CardHeader>
+            <Bold>Attributs</Bold>
+            <DisplayInventory className="float-end" />
+          </CardHeader>
           <CardBody>
             <Container className="text-center">
               <DisplayAttribute
@@ -176,7 +195,7 @@ export function Summary() {
         </Card>
         <Card>
           <CardHeader>
-            <span>Combat & Magie</span>
+            <Bold>Combat & Magie</Bold>
             <Badge pill color="secondary" className='float-end'>PM {summary.magicRecovery > 0 && "+"}{summary.magicRecovery}</Badge>
             {!!summary.actionPointsBonus && <Badge pill color="secondary" className='float-end'>PA {summary.actionPointsBonus > 0 && "+"}{summary.actionPointsBonus}%</Badge>}
             {!!summary.regeneration && <Badge pill color="secondary" className='float-end'>REG {summary.regeneration > 0 && "+"}{summary.regeneration}</Badge>}
@@ -201,11 +220,9 @@ export function Summary() {
               ]} />
           </CardBody>
         </Card>
-      </CardGroup>
-      <DisplayWeapons />
-      <CardGroup>
+        <DisplayWeapons />
         <Card>
-          <CardHeader>Résistances élémentaires</CardHeader>
+          <CardHeader><Bold>Résistances élémentaires</Bold></CardHeader>
           <CardBody>
             {summary.elementaryResistances.map(({ value, element }) => (
               <span key={element} className="mx-1">
@@ -213,12 +230,16 @@ export function Summary() {
               </span>))}
           </CardBody>
         </Card>
+        {talents.map(talentId => {
+          const talent = magicScrolls.find(talent => talent.id === talentId);
+          if (!talent) {
+            return null;
+          }
+          return (
+            <DisplayTalent key={talent.id} summary={summary} {...talent} />
+          );
+        })}
       </CardGroup>
-      <Row className="row-cols-1 row-cols-md-2">
-        {talents.map(talent => (
-          <Col key={talent.id.toString()}><DisplayTalent summary={summary} {...talent} /></Col>
-        ))}
-      </Row>
     </>
   );
 }

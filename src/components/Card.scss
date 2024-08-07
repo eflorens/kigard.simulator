@@ -1,0 +1,35 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+.card-group {
+    @include media-breakpoint-up(sm) {
+        &.group-col-2 {
+            >.card {
+                min-width: 40%;
+
+                + .card {
+                    border-left: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+                    &:nth-child(even) {
+                        border-left: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+                    }
+            
+                    &:nth-child(odd) {
+                        border-right: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+                    }
+                }
+
+                // Handle rounded corners
+                @if $enable-rounded {
+                  &:not(:last-child):nth-child(even) {
+                    @include border-end-radius(var(--#{$prefix}card-border-radius));
+                  }
+          
+                  &:not(:first-child):nth-child(odd) {
+                    @include border-start-radius(var(--#{$prefix}card-border-radius));
+                  }
+                }
+            }
+        }
+    }
+}

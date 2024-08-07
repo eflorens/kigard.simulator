@@ -3,7 +3,6 @@ import { selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
-import { Talent } from "../../data/talents";
 
 interface Attributes {
   strength: number;
@@ -37,7 +36,8 @@ export interface SummaryState extends Attributes {
   regeneration: number;
   primaryWeapon: Weapon;
   secondaryWeapon: Weapon;
-  talents: Talent[];
+  talents: number[];
+  inventory: {id: number, name: string}[];
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
@@ -181,8 +181,8 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     mana: (evolution.character.profile.mind + total.mind) * 2,
     vitality: (evolution.character.profile.constitution + total.constitution) * 10,
     talents: [
-      ...Object.entries(inventory?.magicScrolls.rightHand).map((scroll) => scroll[1]),
-      ...Object.entries(inventory?.magicScrolls.leftHand).map((scroll) => scroll[1]),
+      ...Object.entries(inventory?.magicScrolls.rightHand).map((scroll) => scroll[1]).filter(scroll => !!scroll),
+      ...Object.entries(inventory?.magicScrolls.leftHand).map((scroll) => scroll[1]).filter(scroll => !!scroll),
     ],
   };
 
@@ -202,10 +202,24 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       + ((isLeftHand && 2) || 0),
     accuracy: summary.accuracy + (leftWeapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
   };
+  
+  const getSummaryItem = (item?: Item) => (item && {
+    id: item.id,
+    name: item.name,
+  });
+  const inventorySummary = [
+    getSummaryItem(inventory.head?.item),
+    getSummaryItem(inventory.bust?.item),
+    getSummaryItem(weapon),
+    getSummaryItem(leftWeapon),
+    getSummaryItem(inventory.feet?.item),
+    getSummaryItem(inventory.fetish?.item),
+  ].filter(item => !!item);
 
   return {
     ...summary,
     primaryWeapon,
     secondaryWeapon,
+    inventory: inventorySummary,
   } as SummaryState;
 });

@@ -2,7 +2,7 @@ import { SummaryState } from "../summary/SummarySlice";
 import { DisplayElement } from "../../components/DisplayElement";
 import { ElementId } from "../../data/inventory";
 import { BoxType } from "../../data/talents";
-import { Card, CardHeader, CardBody, Row, Col } from "../../components";
+import { Card, CardHeader, CardBody, Bold, CardTitle } from "../../components";
 
 interface DisplayTalentProps {
   className?: string;
@@ -37,21 +37,23 @@ function DisplayArea({ area }: { area: BoxType | { x: number, y: number } }) {
   return <></>;
 }
 
+export function Separator() {
+  return <span className="mx-1">-</span>;
+}
+
 export function DisplayTalent({ className, name, usageCost, reusable, range, area, element, summary, getDescription }: DisplayTalentProps) {
   return (
     <Card className={className}>
       <CardHeader className="text-center">
-        <Row>
-          <Col>{name}</Col>
-        </Row>
-        <Row className="small">
-          <Col>{usageCost} PA&PM</Col>
-          {area && <Col><DisplayArea area={area} /></Col>}
-          {range && <Col>Portée : {(range.min === range.max && range.min) || `${range.min} à ${range.max}`}</Col>}
-          {reusable && <Col>Action libre</Col>}
-          {element && <Col><DisplayElement element={element} /></Col>}
-        </Row>
+        <Bold>{name}</Bold>
       </CardHeader>
+      <CardTitle className="text-center">
+        <span>{usageCost} PA&PM</span>
+        {area && <><Separator /><DisplayArea area={area} /></>}
+        {range && <><Separator /><span>Portée : {(range.min === range.max && range.min) || `${range.min} à ${range.max}`}</span></>}
+        {reusable && <><Separator /><span>Action libre</span></>}
+        {element && <><Separator /><DisplayElement element={element} /></>}
+      </CardTitle>
       <CardBody>
         {getDescription(summary)}
       </CardBody>

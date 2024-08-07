@@ -35,6 +35,7 @@ function DisplayAttribute({
         <Button
           color="primary"
           aria-label={`Decrement ${label}`}
+          size='sm'
           className='float-start'
           outline
           onClick={onDecrement}
@@ -45,6 +46,7 @@ function DisplayAttribute({
         <Button
           color="primary"
           aria-label={`Increment ${label}`}
+          size='sm'
           className='float-end'
           outline
           onClick={onIncrement}
@@ -70,7 +72,7 @@ export function Evolution() {
   return (
     <>
       <h4><DisplayBreed /></h4>
-      <CardGroup>
+      <CardGroup className="group-col-2">
         <Card>
           <CardBody>
             <Container className="text-center">
