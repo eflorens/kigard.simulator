@@ -197,7 +197,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
   const isLeftHand = leftWeapon?.id === 311;
   const secondaryWeapon: Weapon = leftWeapon && {
     ...leftWeapon,
-    damage: (leftWeapon.range && leftWeapon.range.min > 1 ? summary.dexterity : summary.strength)
+    damage: (leftWeapon.range && leftWeapon.range.max > 1 ? summary.dexterity : summary.strength)
       + (leftWeapon.damage || 0)
       + ((isLeftHand && 2) || 0),
     accuracy: summary.accuracy + (leftWeapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
