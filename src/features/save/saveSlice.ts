@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Improvements, selectEvolution } from "../evolution/evolutionSlice";
+import { Improvements, selectEvolution, TalentType } from "../evolution/evolutionSlice";
 import { Inventory, OneItemPerHand, selectInventory, ShareInventory } from "../inventory/inventorySlice";
 import { BreedId } from "../../data/character";
 import { Item, Weapon } from "../../data/inventory";
@@ -8,13 +8,15 @@ import { RootState } from "../../app/store";
 export enum Tabs {
   Evolution = 1,
   Inventory = 2,
-  Summary = 3,
+  Talents = 3,
+  Summary = 4,
 }
 
 export interface Simulator {
   breed: BreedId,
   improvements: Improvements,
   inventory: ShareInventory,
+  talents: { id: number, type: TalentType }[];
 }
 
 interface Backup {
@@ -59,7 +61,7 @@ export const saveSlice = createSlice({
   }
 });
 
-export const selectCurrent = createSelector([selectEvolution, selectInventory], ({ breed, experience }, inventory) => {
+export const selectCurrent = createSelector([selectEvolution, selectInventory], ({ breed, experience, talents }, inventory) => {
 
   const share = ({ enchantment, item, settings }: Inventory<Item | Weapon>) => {
     if (!item) {
@@ -109,7 +111,8 @@ export const selectCurrent = createSelector([selectEvolution, selectInventory], 
           .map((scroll) => scroll[1])
           .filter(scroll => !!scroll),
       }
-    }
+    },
+    talents: Object.entries(talents).map(talent => talent[1]).filter(talent => !!talent),
   };
 
   return simulator;

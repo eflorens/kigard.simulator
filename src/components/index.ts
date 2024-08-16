@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader, CardColumns, CardGroup, CardSubtitle, CardT
 import { Container, Row, Col } from "./Container";
 import { DropdownList } from "./DropdownList";
 import { Input } from "./Input";
-import { ListGroup, ListGroupItem } from "./ListGroup";
+import { List, ListGroup, ListGroupItem } from "./ListGroup";
 import { Nav, NavItem, NavLink } from "./Nav";
 import { Navbar, NavbarBrand, NavbarText } from "./Navbar";
 import { Offcanvas, OffcanvasBody, OffcanvasHeader } from "./Offcanvas";
@@ -30,6 +30,7 @@ export {
     Col,
     DropdownList,
     Input,
+    List,
     ListGroup,
     ListGroupItem,
     Nav,

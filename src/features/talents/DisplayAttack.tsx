@@ -9,7 +9,7 @@ interface DamageProps {
   type: DamageType;
 }
 
-export function DisplayDamageType({ type }: { type: DamageType }) {
+export function DisplayDamageType({ type }: Readonly<{ type: DamageType }>) {
   const damageTypeToString = (type: DamageType) => {
     switch (type) {
       case DamageType.Pure:
@@ -26,7 +26,7 @@ export function DisplayDamageType({ type }: { type: DamageType }) {
   )
 }
 
-function Damage({ value, type, element }: DamageProps & { element?: ElementId }) {
+export function DisplayDamage({ value, type, element }: DamageProps & { element?: ElementId }) {
   return (
     <>
       <span className="fw-bold">{value} </span>
@@ -42,14 +42,14 @@ interface DisplayAttackProps {
   damage?: { value: number, type: DamageType };
 }
 
-export function DisplayAttack({ element, damage, status: attackStatus }: DisplayAttackProps) {
+export function DisplayAttack({ element, damage, status: attackStatus }: Readonly<DisplayAttackProps>) {
   return (
     <Row>
       <Col>
         <span>Inflige </span>
-        {damage && <Damage {...damage} element={element} />}
+        {damage && <DisplayDamage {...damage} element={element} />}
         {(attackStatus && damage) && <span> et </span>}
-        {attackStatus && attackStatus.map(({ value, status }, index) => (
+        {attackStatus?.map(({ value, status }, index) => (
           <span key={status}>
             {index > 0 && <span> et </span>}
             <span className="fw-bold">{value} </span>

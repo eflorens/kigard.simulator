@@ -2,6 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import Character, { BreedId, Breeds, Profile } from '../../data/character';
 
+export enum TalentType {
+  Technique = 0,
+  MagicScroll = 1,
+}
+
 export interface AttributeExperience {
   total: number;
   improvements: number;
@@ -26,6 +31,7 @@ export interface Improvements {
 
 interface Experience {
   total: number;
+  rank: number;
   strength: AttributeExperience;
   dexterity: AttributeExperience;
   intelligence: AttributeExperience;
@@ -44,6 +50,7 @@ export interface EvolutionState {
   character: Character;
   experience: Experience;
   breed: BreedId;
+  talents: { [index: number]: { id: number, type: TalentType } };
 }
 const baseProfile: Profile = {
   strength: 10,
@@ -163,8 +170,10 @@ const xpCost = 50;
 const initialState: EvolutionState = {
   character: createHuman(),
   breed: BreedId.HUMAN,
+  talents: [],
   experience: {
     total: 0,
+    rank: 1,
     strength: {
       total: 0,
       next: xpCost,
@@ -248,13 +257,24 @@ const computeImprovements = (current: AttributeExperience, nbImprovements: numbe
   return Math.min(10, Math.max(0, current.improvements + nbImprovements)) - current.improvements;
 }
 
+const computeRank = (xp: number) => {
+  if (xp < 1000) {
+    return 1;
+  }
+  if (xp < 3000) {
+    return 2;
+  }
+
+  return 3;
+}
+
 export const evolutionSlice = createSlice({
   name: 'evolution',
   initialState,
   reducers: {
     setBreed: (state, action: PayloadAction<BreedId>) => {
       state.breed = action.payload;
-      state.experience = { ...initialState.experience};
+      state.experience = { ...initialState.experience };
       switch (action.payload) {
         case BreedId.ELF:
           state.character = createElf();
@@ -289,18 +309,33 @@ export const evolutionSlice = createSlice({
     },
     improve: (state, action: PayloadAction<Partial<Improvements>>) => {
       (Object.keys(action.payload) as (keyof Improvements)[]).forEach((key) => {
-        const improvements = computeImprovements(state.experience[key], action.payload[key] || 0);
+        const improvements = computeImprovements(state.experience[key], action.payload[key] ?? 0);
 
         if (improvements !== 0) {
           state.character.profile[key] += improvements * state.experience[key].step;
-  
+
           const xp = computeExperience(state.experience[key], improvements);
           state.experience[key].total += xp;
           state.experience[key].next += improvements * xpCost;
           state.experience[key].improvements += improvements;
           state.experience.total += xp;
+          state.experience.rank = computeRank(state.experience.total);
         }
       });
+    },
+    setTalent(state, action: PayloadAction<{ index: number, talent?: { id: number, type: TalentType } }>) {
+      if (!action.payload.talent) {
+        delete state.talents[action.payload.index];
+      } else {
+        state.talents[action.payload.index] = { id: action.payload.talent.id, type: action.payload.talent.type };
+      }
+    },
+    setTalents(state, action: PayloadAction<{ id: number, type: TalentType }[]>) {
+
+      state.talents = action.payload.reduce((talents, talent, index) => {
+        talents[index] = { id: talent.id, type: talent.type };
+        return talents;
+      }, {} as { [index: number]: { id: number, type: TalentType } });
     },
   },
 });
@@ -308,6 +343,8 @@ export const evolutionSlice = createSlice({
 export const {
   setBreed,
   improve,
+  setTalent,
+  setTalents,
 } = evolutionSlice.actions;
 
 export const selectEvolution = (state: RootState) => state.evolution;

@@ -2,15 +2,16 @@
 import { Fragment } from 'react/jsx-runtime';
 import { useAppSelector } from '../../app/hooks';
 import { Badge, Bold, Card, CardBody, CardGroup, CardHeader, Col, Container, Progress, Row } from '../../components';
-import { selectSummary } from './SummarySlice';
-import { Weapon } from '../../data/inventory';
+import { HandSummary, selectSummary } from './SummarySlice';
 import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
 import { DisplayElement } from '../../components/DisplayElement';
 import { DisplayStatus } from '../../components/DisplayStatus';
 import { DisplayItemImage } from '../../components/DisplayItemImage';
 import { DisplayBreed } from '../evolution/DisplayBreed';
 import { DisplayTalent } from '../talents/DisplayTalent';
-import { magicScrolls } from '../../data/talents';
+import { magicScrolls } from '../../data/magicScrolls';
+import { TalentType } from '../evolution/evolutionSlice';
+import { techniques } from '../../data/techniques';
 
 interface AttributeProps {
   label: string;
@@ -34,7 +35,7 @@ function DisplayAttribute({ attributes }: Readonly<DisplayAttributeProps>) {
   );
 }
 
-function DisplayVitality({ vitality }: { vitality: number }) {
+function DisplayVitality({ vitality }: Readonly<{ vitality: number }>) {
   return (
     <Row>
       <Col xs="3">PV</Col>
@@ -43,7 +44,7 @@ function DisplayVitality({ vitality }: { vitality: number }) {
   );
 }
 
-function DisplayMana({ mana }: { mana: number }) {
+function DisplayMana({ mana }: Readonly<{ mana: number }>) {
   return (
     <Row>
       <Col xs="3">PM</Col>
@@ -67,9 +68,13 @@ function DisplayInventory(props: React.DetailedHTMLProps<React.HTMLAttributes<HT
 
 }
 
-function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
+function DisplayWeapon({ weapon }: Readonly<{ weapon?: HandSummary }>) {
   if (!weapon) {
-    return <Container>Aucune arme</Container>
+    return <span>Aucune arme</span>
+  }
+
+  if (!weapon.isWeapon) {
+    return <span>L'objet équipé n'est pas une arme</span>
   }
 
   return (
@@ -80,17 +85,17 @@ function DisplayWeapon({ weapon }: { weapon?: Weapon }) {
         <Col>
           <span className="text-nowrap">
             PRE&nbsp;
-            {weapon.accuracy}%
+            {weapon.baseAccuracy + weapon.accuracy}%
           </span>
         </Col>
         <Col>
           <span className="text-nowrap">
             DGT&nbsp;
-            {weapon.damage}&nbsp;
+            {weapon.baseDamage + weapon.damage}&nbsp;
             {weapon.element && <DisplayElement element={weapon.element} />}
           </span>
         </Col>
-        {weapon.status && weapon.status.map(({ value, status }) => (
+        {weapon?.status?.map(({ value, status }) => (
           <Col key={status}>
             <span className="text-nowrap">{value}</span>
             <DisplayStatus status={status} />
@@ -122,24 +127,28 @@ function DisplayWeapons() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <Bold>Arme principale</Bold>
-          {primaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>}
-        </CardHeader>
-        <CardBody>
-          <DisplayWeapon weapon={primaryWeapon} />
-        </CardBody>
-      </Card>
-      <Card>
-        <CardHeader>
-          <Bold>Arme secondaire</Bold>
-          {secondaryWeapon?.usageCost !== undefined && <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>}
-        </CardHeader>
-        <CardBody>
-          <DisplayWeapon weapon={secondaryWeapon} />
-        </CardBody>
-      </Card>
+      {primaryWeapon?.isWeapon && (
+        <Card>
+          <CardHeader>
+            <Bold>Arme principale</Bold>
+            <Badge pill color="secondary" className='float-end'>{primaryWeapon?.usageCost}PA</Badge>
+          </CardHeader>
+          <CardBody>
+            <DisplayWeapon weapon={primaryWeapon} />
+          </CardBody>
+        </Card>
+      )}
+      {secondaryWeapon?.isWeapon && (
+        <Card>
+          <CardHeader>
+            <Bold>Arme secondaire</Bold>
+            <Badge pill color="secondary" className='float-end'>{secondaryWeapon?.usageCost}PA</Badge>
+          </CardHeader>
+          <CardBody>
+            <DisplayWeapon weapon={secondaryWeapon} />
+          </CardBody>
+        </Card>
+      )}
     </>
   );
 }
@@ -230,13 +239,25 @@ export function Summary() {
               </span>))}
           </CardBody>
         </Card>
-        {talents.map(talentId => {
-          const talent = magicScrolls.find(talent => talent.id === talentId);
+        {talents.map(t => {
+          const talent = (t.type === TalentType.MagicScroll && magicScrolls.find(talent => talent.id === t.id))
+            || (t.type === TalentType.Technique && techniques.find(talent => talent.id === t.id));
           if (!talent) {
             return null;
           }
           return (
-            <DisplayTalent key={talent.id} summary={summary} {...talent} />
+            <DisplayTalent
+              key={talent.id}
+              title={talent.name}
+              usageCost={(typeof talent.usageCost === "function" && talent.usageCost(summary)) || talent.usageCost as (number | string)}
+              manaCost={talent.manaCost}
+              reusable={talent.reusable}
+              range={(typeof talent.range === "function" && talent.range(summary)) || talent.range as { min: number, max: number }}
+              area={talent.area}
+              element={talent.element}
+              required={talent.required}
+              description={talent.getDescription(summary)}
+            />
           );
         })}
       </CardGroup>

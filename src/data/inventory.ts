@@ -3,11 +3,16 @@ export enum Status {
   Restrained = 2,
   Piercing = 3,
   Poisoned = 4,
+  Inspiration = 5,
+  Overload = 6,
   Force = 8,
   Necrosis = 9,
+  Defense = 10,
   Regeneration = 11,
   Endurance = 12,
   Furtivity = 13,
+  Horse = 14,
+  MysticalSubterfuge = 15,
   Burning = 16,
   Bleeding = 17,
   Aegis = 19,
@@ -15,8 +20,12 @@ export enum Status {
   Immunity = 21,
   Hability = 22,
   Vivacious = 23,
+  Protect = 26,
+  Hitback = 27,
+  Impact = 28,
   Exalted = 30,
   Bewitched = 31,
+  Exposed = 32,
   Freeze = 39,
   Will = 40,
 }
@@ -26,7 +35,7 @@ export const allStatus = [{
   name: "Assomé"
 }, {
   id: Status.Restrained,
-  name: "Entravé"
+  name: "Ralenti"
 }, {
   id: Status.Piercing,
   name: "Faille"
@@ -34,11 +43,20 @@ export const allStatus = [{
   id: Status.Poisoned,
   name: "Poison"
 }, {
+  id: Status.Inspiration,
+  name: "Inspiration"
+}, {
+  id: Status.Overload,
+  name: "Surcharge"
+}, {
   id: Status.Force,
   name: "Force"
 }, {
   id: Status.Necrosis,
   name: "Nécrose"
+}, {
+  id: Status.Defense,
+  name: "Défense"
 }, {
   id: Status.Regeneration,
   name: "Régénération"
@@ -48,6 +66,12 @@ export const allStatus = [{
 }, {
   id: Status.Furtivity,
   name: "Furtif"
+}, {
+  id: Status.Horse,
+  name: "A cheval"
+}, {
+  id: Status.MysticalSubterfuge,
+  name: "Subterfuge mystique"
 }, {
   id: Status.Burning,
   name: "Brûlure"
@@ -70,11 +94,23 @@ export const allStatus = [{
   id: Status.Vivacious,
   name: "Vivace"
 }, {
+  id: Status.Protect,
+  name: "Protéger"
+}, {
+  id: Status.Hitback,
+  name: "Riposte"
+}, {
+  id: Status.Impact,
+  name: "Impact"
+}, {
   id: Status.Exalted,
   name: "Exalté"
 }, {
   id: Status.Bewitched,
   name: "Envoûté"
+}, {
+  id: Status.Exposed,
+  name: "Exposé"
 }, {
   id: Status.Freeze,
   name: "Gel"
@@ -612,7 +648,7 @@ const oneHandWeapon: Weapon[] = [{
   }],
 }, {
   id: 311,
-  name: 'Main-gauche', // Todo : specific bonus (damage +2 & accuracy +10%) when used at left hand
+  name: 'Main-gauche',
   weight: 2,
   damage: 3,
   usageCost: 4,
@@ -1041,6 +1077,7 @@ const twoHands: Weapon[] = [{
   id: 327,
   name: 'Fusil',
   weight: 3,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   range: { min: 2, max: 3 },
@@ -1049,6 +1086,7 @@ const twoHands: Weapon[] = [{
   id: 326,
   name: 'Carabine harpie',
   weight: 3,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   range: { min: 2, max: 4 },
@@ -1090,6 +1128,7 @@ const twoHands: Weapon[] = [{
   id: 10,
   name: 'Epée large',
   weight: 4,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 4,
   damage: 5,
@@ -1097,6 +1136,7 @@ const twoHands: Weapon[] = [{
   id: 246,
   name: 'Epée géante',
   weight: 4,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   damage: 9,
@@ -1104,6 +1144,7 @@ const twoHands: Weapon[] = [{
   id: 245,
   name: 'Guillotineuse',
   weight: 5,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   damage: 10,
@@ -1112,6 +1153,7 @@ const twoHands: Weapon[] = [{
   id: 147,
   name: 'Flamberge',
   weight: 5,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   damage: 12,
@@ -1119,6 +1161,7 @@ const twoHands: Weapon[] = [{
   id: 122,
   name: 'Claymore',
   weight: 5,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   damage: 10,

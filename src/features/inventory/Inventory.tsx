@@ -6,9 +6,10 @@ import { DisplayElementaryResistance } from "../../components/DisplayElementaryR
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { DisplayItemImage } from "../../components/DisplayItemImage";
 import { DisplayElement } from "../../components/DisplayElement";
-import { MagicScrollId, magicScrolls, Talent } from "../../data/talents";
+import { Talent } from "../../data/talents";
+import { MagicScrollId, magicScrolls } from "../../data/magicScrolls";
 
-function DisplayAttributeItem({ item }: { item?: Item }) {
+function DisplayAttributeItem({ item }: Readonly<{ item?: Item }>) {
   if (!item) {
     return <span>Aucun</span>;
   }
@@ -68,7 +69,7 @@ function DisplayAttributeItem({ item }: { item?: Item }) {
 
 }
 
-function DisplayItem<T extends Item>({ item, showDetails }: { item?: T, showDetails?: boolean }) {
+function DisplayItem<T extends Item>({ item, showDetails }: Readonly<{ item?: T, showDetails?: boolean }>) {
   if (!item) {
     return <span>Aucun</span>;
   }
@@ -93,7 +94,7 @@ interface ChooseItemProps<T extends Item> {
   currentMagicScrolls?: { [index: number]: MagicScrollId };
 }
 
-function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSettingsChange, onMagicScrollChange, source, current, currentMagicScrolls }: ChooseItemProps<T>) {
+function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSettingsChange, onMagicScrollChange, source, current, currentMagicScrolls }: Readonly<ChooseItemProps<T>>) {
   return (
     <ListGroupItem>
       <Row className="text-center">

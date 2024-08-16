@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEnchantments, allSettings, bust, feet, fetish, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
-import { MagicScrollId } from '../../data/talents';
+import { MagicScrollId } from '../../data/magicScrolls';
 
 interface ShareItem {
   id: number;
@@ -59,9 +59,9 @@ const initialState: InventoryState = {
 };
 
 function computeSettingsOnItemChange<T extends Item>(current?: Inventory<T>, item?: T) {
-  return !current?.settings || !current.settings.second || item?.doubleSetting
-    ? current?.settings || {}
-    : { first: current.settings.second, second: undefined };
+  return current?.settings?.second && !item?.doubleSetting
+    ? { first: current.settings.second, second: undefined }
+    : current?.settings || {}
 }
 
 function loadItem<T extends Item>(allItems: T[], shareItem?: ShareItem) {
@@ -81,7 +81,7 @@ function loadItem<T extends Item>(allItems: T[], shareItem?: ShareItem) {
 
 const loadMagicScrolls = (hand?: number[]) => {
   return hand?.map((id, index) => ({ id, index })).reduce((previous, current) => {
-    previous[current.index] =current.id;
+    previous[current.index] = current.id;
     return previous;
   }, {} as { [index: number]: MagicScrollId }) || {};
 }
@@ -95,10 +95,7 @@ const inventorySlice = createSlice({
       state.bust = loadItem(bust, action.payload.bust);
       state.feet = loadItem(feet, action.payload.feet);
       state.fetish = loadItem(fetish, action.payload.fetish);
-      if (!!action.payload.hands) {
-        state.hands = loadItem(twoHands, action.payload.hands);
-      }
-      else {
+      if (!action.payload.hands) {
         state.hands = {
           leftHand: loadItem(hand, action.payload.leftHand),
           rightHand: loadItem(hand, action.payload.rightHand),
@@ -107,6 +104,9 @@ const inventorySlice = createSlice({
           rightHand: loadMagicScrolls(action.payload.magicScrolls?.rightHand),
           leftHand: loadMagicScrolls(action.payload.magicScrolls?.leftHand)
         };
+      }
+      else {
+        state.hands = loadItem(twoHands, action.payload.hands);
       }
     },
     setMagicScrolls(state, action: PayloadAction<{ index: number, slot: "rightHand" | "leftHand", scroll: MagicScrollId }>) {
@@ -202,7 +202,7 @@ const inventorySlice = createSlice({
 
       state[slot] = {
         enchantment: current?.enchantment,
-        settings: computeSettingsOnItemChange(current, undefined),
+        settings: computeSettingsOnItemChange(current),
       };
     },
     equipTwoHands(state, action: PayloadAction<Weapon>) {

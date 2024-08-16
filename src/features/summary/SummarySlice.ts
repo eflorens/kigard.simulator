@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { selectEvolution } from "../evolution/evolutionSlice";
+import { selectEvolution, TalentType } from "../evolution/evolutionSlice";
 import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
-import { ElementId, Item, Modifier, Weapon } from "../../data/inventory";
+import { ElementId, Item, ItemStatus, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
 
 interface Attributes {
@@ -25,6 +25,21 @@ interface Attributes {
   regeneration: number;
 }
 
+export interface HandSummary {
+  id: number,
+  name: string;
+  baseDamage: number;
+  damage: number;
+  baseAccuracy: number;
+  accuracy: number;
+  usageCost: number;
+  elementaryAffinity?: ElementId;
+  element?: ElementId;
+  status?: ItemStatus[];
+  isWeapon: boolean;
+  range: { min: number, max: number };
+}
+
 export interface SummaryState extends Attributes {
   elementaryResistances: { value: number, element: ElementId }[];
   empathie: number;
@@ -34,10 +49,10 @@ export interface SummaryState extends Attributes {
   magicRecovery: number;
   actionPointsBonus: number;
   regeneration: number;
-  primaryWeapon: Weapon;
-  secondaryWeapon: Weapon;
-  talents: number[];
-  inventory: {id: number, name: string}[];
+  primaryWeapon?: HandSummary;
+  secondaryWeapon?: HandSummary;
+  talents: { id: number, type: TalentType }[];
+  inventory: { id: number, name: string }[];
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
@@ -88,15 +103,18 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       value: 0,
       element: ElementId.Wind
     }];
+    
+    const applyEnchantment = (item: Item | Weapon, enchantment: Modifier) => {
+      return (item.enhancedEnchantment && [enchantment, enchantment]) || [enchantment];
+    }
 
     const getModifiers = ({ enchantment, item, settings }: Inventory<Item | Weapon>) => {
       if (!item) {
         return [];
       }
 
-      const enchantments = !enchantment ? [] : item.enhancedEnchantment
-        ? [enchantment, enchantment]
-        : [enchantment];
+      const enchantments = (enchantment && applyEnchantment(item, enchantment)) || [];
+      
       const settingCollection = [settings.first, settings.second]
         .filter(setting => !!setting);
 
@@ -130,15 +148,15 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     for (const { slot, item } of items) {
       if (item.item) {
         for (attribute in item.item as Attributes) {
-          if ((slot !== "hands" && slot !== "rightHand" && slot !== "leftHand") || (attribute !== "accuracy" && attribute !== "damage")) {
-            total[attribute] += item.item[attribute] || 0;
+          if ((slot !== "hands" && slot !== "rightHand" && slot !== "leftHand") || !(item.item as Weapon)?.usageCost || (attribute !== "accuracy" && attribute !== "damage")) {
+            total[attribute] += item.item[attribute] ?? 0;
           }
         }
       }
     }
     for (const modifier of modifiers) {
       for (attribute in modifier as Attributes) {
-        total[attribute] += modifier[attribute] || 0;
+        total[attribute] += modifier[attribute] ?? 0;
       }
     }
 
@@ -181,28 +199,52 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     mana: (evolution.character.profile.mind + total.mind) * 2,
     vitality: (evolution.character.profile.constitution + total.constitution) * 10,
     talents: [
-      ...Object.entries(inventory?.magicScrolls.rightHand).map((scroll) => scroll[1]).filter(scroll => !!scroll),
-      ...Object.entries(inventory?.magicScrolls.leftHand).map((scroll) => scroll[1]).filter(scroll => !!scroll),
+      ...Object.entries(inventory?.magicScrolls.rightHand)
+        .map((scroll) => (scroll[1] && { id: scroll[1], type: TalentType.MagicScroll }) || undefined)
+        .filter(scroll => !!scroll),
+      ...Object.entries(inventory?.magicScrolls.leftHand)
+        .map((scroll) => (scroll[1] && { id: scroll[1], type: TalentType.MagicScroll }) || undefined)
+        .filter(scroll => !!scroll),
+      ...Object.entries(evolution.talents).map(talent => talent[1]).filter(talent => !!talent),
     ],
   };
+  const getBaseDamage = (weapon: Weapon) => (!weapon.range || weapon.range.max === 1)
+    ? summary.strength
+    : summary.dexterity;
 
-  const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon) || (inventory.hands as Inventory<Weapon>)?.item;
-  const primaryWeapon: Weapon = weapon && {
-    ...weapon,
-    damage: (weapon.range && weapon.range.max > 1 ? summary.dexterity : summary.strength) + (weapon.damage || 0),
-    accuracy: summary.accuracy + (weapon?.accuracy || 0),
+  const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon | undefined) || (inventory.hands as Inventory<Weapon>)?.item;
+  const primaryWeapon: HandSummary | undefined = weapon && {
+    id: weapon.id,
+    name: weapon.name,
+    baseDamage: getBaseDamage(weapon),
+    damage: (weapon.damage ?? 0) + summary.damage,
+    baseAccuracy: summary.accuracy,
+    accuracy: (weapon?.accuracy ?? 0),
+    usageCost: weapon.usageCost,
+    elementaryAffinity: weapon.elementaryAffinity,
+    element: weapon.element,
+    status: weapon.status,
+    isWeapon: !!weapon.usageCost,
+    range: weapon.range || { min: 1, max: 1 },
   };
 
-  const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon;
+  const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon | undefined;
   const isLeftHand = leftWeapon?.id === 311;
-  const secondaryWeapon: Weapon = leftWeapon && {
-    ...leftWeapon,
-    damage: (leftWeapon.range && leftWeapon.range.max > 1 ? summary.dexterity : summary.strength)
-      + (leftWeapon.damage || 0)
-      + ((isLeftHand && 2) || 0),
-    accuracy: summary.accuracy + (leftWeapon?.accuracy || 0)+ ((isLeftHand && 10) || 0),
+  const secondaryWeapon: HandSummary | undefined = leftWeapon && {
+    id: leftWeapon.id,
+    name: leftWeapon.name,
+    baseDamage: getBaseDamage(leftWeapon),
+    damage: (leftWeapon.damage ?? 0) + ((isLeftHand && 2) || 0) + summary.damage,
+    baseAccuracy: summary.accuracy,
+    accuracy: (leftWeapon?.accuracy ?? 0) + ((isLeftHand && 10) || 0),
+    usageCost: leftWeapon.usageCost,
+    elementaryAffinity: leftWeapon.elementaryAffinity,
+    element: leftWeapon.element,
+    status: leftWeapon.status,
+    isWeapon: !!leftWeapon.usageCost,
+    range: leftWeapon.range || { min: 1, max: 1 },
   };
-  
+
   const getSummaryItem = (item?: Item) => (item && {
     id: item.id,
     name: item.name,

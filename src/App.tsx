@@ -5,14 +5,9 @@ import { Inventory } from "./features/inventory/Inventory";
 import { Summary } from "./features/summary/Summary";
 import ToastContainer from './features/toastr/ToastContainer';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { selectTab, setActiveTab } from './features/save/saveSlice';
+import { selectTab, setActiveTab, Tabs } from './features/save/saveSlice';
 import { Layout } from './Layout';
-
-enum Tabs {
-  Evolution = 1,
-  Inventory = 2,
-  Summary = 3,
-}
+import { Talents } from './features/talents/Talents';
 
 function Toolbox() {
   const dispatch = useAppDispatch();
@@ -31,6 +26,9 @@ function Toolbox() {
         <NavItem active={activeTab === Tabs.Inventory} onClick={() => setActive(Tabs.Inventory)}>
           <NavLink active={activeTab === Tabs.Inventory} href='#'>Equipement</NavLink>
         </NavItem>
+        <NavItem active={activeTab === Tabs.Talents} onClick={() => setActive(Tabs.Talents)}>
+          <NavLink active={activeTab === Tabs.Talents} href='#'>Talents</NavLink>
+        </NavItem>
         <NavItem active={activeTab === Tabs.Summary} onClick={() => setActive(Tabs.Summary)}>
           <NavLink active={activeTab === Tabs.Summary} href='#'>Résumé</NavLink>
         </NavItem>
@@ -41,6 +39,9 @@ function Toolbox() {
         </TabPane>
         <TabPane tabId={Tabs.Inventory}>
           <Inventory />
+        </TabPane>
+        <TabPane tabId={Tabs.Talents}>
+          <Talents />
         </TabPane>
         <TabPane tabId={Tabs.Summary}>
           <Summary />

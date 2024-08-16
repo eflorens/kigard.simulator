@@ -6,7 +6,7 @@ interface DisplaySupportProps {
   status: { value: number, status: Status }[];
 }
 
-export function DisplaySupport({ status: attackStatus }: DisplaySupportProps) {
+export function DisplaySupport({ status: attackStatus }: Readonly<DisplaySupportProps>) {
   return (
     <Row>
       <Col>Confère {attackStatus.map(({ value, status }, index) => (

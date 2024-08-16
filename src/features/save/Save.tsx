@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { setToast } from "../toastr/toastSlice";
 import { removeBackup, saveBackup, selectCurrent, selectStore, setActiveTab, Simulator, Tabs } from "./saveSlice";
-import { setBreed, improve } from "../evolution/evolutionSlice";
+import { setBreed, improve, setTalents } from "../evolution/evolutionSlice";
 import { load } from "../inventory/inventorySlice";
 import { SizeProp } from "@fortawesome/fontawesome-svg-core";
 import { BreedId } from "../../data/character";
@@ -17,7 +17,7 @@ interface BackupProps {
   loadSimulator: (simulator: Simulator) => void;
 }
 
-function ShareButton({ simulator, size }: { simulator: Simulator, size?: SizeProp }) {
+function ShareButton({ simulator, size }: Readonly<{ simulator: Simulator, size?: SizeProp }>) {
   const dispatch = useAppDispatch();
   const token = window.btoa(JSON.stringify(simulator));
 
@@ -37,7 +37,7 @@ function ShareButton({ simulator, size }: { simulator: Simulator, size?: SizePro
   </Tooltip>)
 }
 
-function SaveButton({ onClick }: { onClick: () => void }) {
+function SaveButton({ onClick }: Readonly<{ onClick: () => void }>) {
   return (
     <Badge color="primary" role="button" pill onClick={onClick}>
       <FontAwesomeIcon icon={faSave} />
@@ -45,7 +45,7 @@ function SaveButton({ onClick }: { onClick: () => void }) {
   );
 }
 
-function LoadButton({ simulator, loadSimulator }: { simulator: Simulator, loadSimulator: (simulator: Simulator) => void }) {
+function LoadButton({ simulator, loadSimulator }: Readonly<{ simulator: Simulator, loadSimulator: (simulator: Simulator) => void }>) {
   return (
     <Tooltip description="Charger">
       <Badge pill role="button" onClick={() => loadSimulator(simulator)} color="info">
@@ -55,7 +55,7 @@ function LoadButton({ simulator, loadSimulator }: { simulator: Simulator, loadSi
   );
 }
 
-function RemoveButton({ name, removeSimulator }: { name: string, removeSimulator: (name: string) => void }) {
+function RemoveButton({ name, removeSimulator }: Readonly<{ name: string, removeSimulator: (name: string) => void }>) {
   return (
     <Tooltip description="Supprimer">
       <Badge pill role="button" onClick={() => removeSimulator(name)} color="danger">
@@ -65,7 +65,7 @@ function RemoveButton({ name, removeSimulator }: { name: string, removeSimulator
   );
 }
 
-function Backup({ name, simulator, onRemove, loadSimulator }: BackupProps) {
+function Backup({ name, simulator, onRemove, loadSimulator }: Readonly<BackupProps>) {
   return (
     <>
       <Col>{name}</Col>
@@ -82,7 +82,7 @@ function Backup({ name, simulator, onRemove, loadSimulator }: BackupProps) {
   );
 }
 
-function DisplayBackUps({ loadSimulator }: { loadSimulator: (simulator: Simulator) => void }) {
+function DisplayBackUps({ loadSimulator }: Readonly<{ loadSimulator: (simulator: Simulator) => void }>) {
   const dispatch = useAppDispatch();
   const store = useAppSelector(selectStore);
   const handleRemove = (name: string) => {
@@ -103,7 +103,7 @@ function DisplayBackUps({ loadSimulator }: { loadSimulator: (simulator: Simulato
   );
 }
 
-export function Save({ loadSimulator }: { loadSimulator: (simulator: Simulator) => void }) {
+export function Save({ loadSimulator }: Readonly<{ loadSimulator: (simulator: Simulator) => void }>) {
   const dispatch = useAppDispatch();
   const current = useAppSelector(selectCurrent);
   const [currentName, setCurrentName] = useState("");
@@ -143,6 +143,7 @@ export function SavePanelButton() {
   const reset = useCallback(() => {
     dispatch(setBreed(BreedId.HUMAN));
     dispatch(load({}));
+    dispatch(setTalents([]));
     dispatch(setActiveTab(Tabs.Evolution));
 
     dispatch(setToast({
@@ -159,6 +160,9 @@ export function SavePanelButton() {
     }
     if (simulator.inventory) {
       dispatch(load(simulator.inventory));
+    }
+    if (simulator.talents) {
+      dispatch(setTalents(simulator.talents));
     }
 
     dispatch(setActiveTab(Tabs.Summary))

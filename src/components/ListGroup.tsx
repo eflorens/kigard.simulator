@@ -1,9 +1,20 @@
 import {
+	List as ListStrap,
+	ListProps as ListPropsStrap,
 	ListGroup as ListGroupStrap,
 	ListGroupProps as ListGroupPropsStrap,
 	ListGroupItem as ListGroupItemStrap,
 	ListGroupItemProps as ListGroupItemPropsStrap,
 } from 'reactstrap';
+
+interface ListProps extends ListPropsStrap {
+}
+
+export function List(props: Readonly<ListProps>) {
+	return (
+		<ListStrap {...props} />
+	)
+}
 
 interface ListGroupProps extends ListGroupPropsStrap {
 }
