@@ -1,4 +1,4 @@
-import { Bold, Col, Row, Underline } from "../../components";
+import { Bold, Underline } from "../../components";
 import { DisplayElement } from "../../components/DisplayElement";
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { ElementId, Status } from "../../data/inventory";
@@ -44,8 +44,8 @@ interface DisplayAttackProps {
 
 export function DisplayAttack({ element, damage, status: attackStatus }: Readonly<DisplayAttackProps>) {
   return (
-    <Row>
-      <Col>
+    <span>
+      <span>
         <span>Inflige </span>
         {damage && <DisplayDamage {...damage} element={element} />}
         {(attackStatus && damage) && <span> et </span>}
@@ -56,7 +56,7 @@ export function DisplayAttack({ element, damage, status: attackStatus }: Readonl
             <DisplayStatus status={status} hasLabel />
           </span>
         ))}
-      </Col>
-    </Row>
+      </span>
+    </span>
   )
 }

@@ -61,6 +61,7 @@ function DisplayTalents() {
             area={talent?.area}
             element={talent?.element}
             required={talent?.required}
+            resume={talent?.resume && ((typeof talent.resume === "function" && talent.resume(summary)) || talent.resume as (React.ReactNode | string))}
             description={talent?.getDescription(summary)}
           />
         )

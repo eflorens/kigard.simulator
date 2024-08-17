@@ -1,6 +1,6 @@
 import { DisplayElement } from "../../components/DisplayElement";
 import { AreaType, BoxType, Range } from "../../data/talents";
-import { Card, CardHeader, CardBody, Bold, CardTitle } from "../../components";
+import { Card, CardHeader, CardBody, Bold, CardTitle, Separator } from "../../components";
 import { ElementId } from "../../data/inventory";
 
 interface DisplayTalentProps {
@@ -15,6 +15,7 @@ interface DisplayTalentProps {
   area?: AreaType | AreaType[];
   element?: ElementId;
   required?: string;
+  resume?: React.ReactNode | string;
   description?: React.ReactNode | string;
 }
 
@@ -50,10 +51,6 @@ function DisplayArea({ area }: Readonly<{ area: AreaType | AreaType[] }>) {
   return <></>;
 }
 
-export function Separator() {
-  return <span className="mx-1">-</span>;
-}
-
 function DisplayRange({ range }: Readonly<{ range: Range }>) {
   if (range === "Portée Arme" || range === "Portée Arme + 1") {
     return <span>{range}</span>;
@@ -71,11 +68,12 @@ function DisplayCost({ usageCost, manaCost }: Readonly<{ usageCost: number | str
   )
 }
 
-export function DisplayTalent({ className, title, hideSubTitle, usageCost, manaCost, reusable, discreet, range, area, element, required, description }: Readonly<DisplayTalentProps>) {
+export function DisplayTalent({ className, title, hideSubTitle, usageCost, manaCost, reusable, discreet, range, area, element, required, resume, description }: Readonly<DisplayTalentProps>) {
   return (
     <Card className={className}>
-      <CardHeader className="text-center">
-        <Bold>{title}</Bold>
+      <CardHeader>
+        <Bold className="float-start">{title}</Bold>
+        <span className="float-end">{resume}</span>
       </CardHeader>
       {!hideSubTitle && <CardTitle className="text-center">
         {usageCost !== undefined && <DisplayCost usageCost={usageCost} manaCost={manaCost} />}

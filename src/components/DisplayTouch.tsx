@@ -9,8 +9,8 @@ interface DisplayTouchProps {
 export function DisplayTouch({ critical, semiSuccess }: DisplayTouchProps) {
 	return (
 		<>
-			<Row><Col><Bold>Semi-réussite : </Bold>{critical}</Col></Row>
-			<Row><Col><Bold>Critique : </Bold>{semiSuccess}</Col></Row>
+			<Row><Col><Bold>Semi-réussite : </Bold>{semiSuccess}</Col></Row>
+			<Row><Col><Bold>Critique : </Bold>{critical}</Col></Row>
 		</>
 	)
 }

@@ -1,4 +1,4 @@
-import { Bold, Card, CardBody, CardHeader, Col, Italic, Nav, NavItem, Row, Underline } from "../components";
+import { Badge, Bold, Card, CardBody, CardHeader, Col, CrystalGuardian, Ghost, Ghoul, IceElemental, Italic, List, Row, Skeleton, StoneGolem, Treant, Underline } from "../components";
 import { DisplayElement } from "../components/DisplayElement";
 import { DisplayStatus } from "../components/DisplayStatus";
 import { DisplayTouch } from "../components/DisplayTouch";
@@ -6,7 +6,7 @@ import { SummaryState } from "../features/summary/SummarySlice";
 import { DisplayAttack, DisplayDamageType } from "../features/talents/DisplayAttack";
 import { DisplaySupport } from "../features/talents/DisplaySupport";
 import { ElementId, Status } from "./inventory";
-import { Talent, DamageType, BoxType } from "./talents";
+import { Talent, DamageType, BoxType, ResumeEffect, AccuracyAttack, HealStatus } from "./talents";
 
 export enum MagicScrollId {
   FireBall = 1,
@@ -60,6 +60,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Fire} status={[{ value: 2, status: Status.Burning }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       element={ElementId.Fire}
@@ -77,6 +78,7 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   range: { min: 1, max: 3 },
   element: ElementId.Ice,
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} element={ElementId.Ice} status={[{ value: getMagicPower(summary) / 5, status: Status.Freeze }]} />,
   getDescription: (summary) => {
     return (
       <>
@@ -93,6 +95,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Dark} />,
   getDescription: (summary) => (
     <>
       <Row>
@@ -112,7 +115,8 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 4 },
-  getDescription: (summary: SummaryState) => (
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Restrained }]} />,
+  getDescription: (summary) => (
     <DisplayAttack
       status={[{
         value: getMagicPower(summary) / 5,
@@ -127,7 +131,8 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   range: { min: 1, max: 5 },
   reusable: true,
-  getDescription: (summary: SummaryState) => (
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: 2, status: Status.Bewitched }]} />,
+  getDescription: () => (
     <DisplayAttack
       status={[{
         value: 2,
@@ -142,6 +147,7 @@ export const magicScrolls: Talent[] = [{
   usageCost: 6,
   range: { min: 1, max: 3 },
   area: { x: 3, y: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Thunder} />,
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
@@ -169,15 +175,16 @@ export const magicScrolls: Talent[] = [{
   usageCost: 6,
   range: { min: 1, max: 3 },
   area: { x: 3, y: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: 2, status: Status.Burning }, { value: getMagicPower(summary) / 5, status: Status.Fire }]} />,
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
         <Row>
-          <Col><Bold>Sur case centrale, si libre</Bold> : Génère <Bold>un incendie</Bold> de <Bold>{mag / 5}</Bold> intensité.</Col>
+          <Col><Bold>Sur case centrale, si libre</Bold> : Génère <Bold>un <DisplayStatus status={Status.Fire} hasLabel /></Bold> de <Bold>{mag / 5} <DisplayStatus status={Status.Fire} /></Bold> intensité.</Col>
         </Row>
         <Row>
-          <Col><Bold>Sur décor d'arbre ou d'herbe</Bold> : Devient <Bold>un incendie</Bold> de <Bold>{mag / 5}</Bold> intensité.</Col>
+          <Col><Bold>Sur décor d'arbre ou d'herbe</Bold> : Devient <Bold>un <DisplayStatus status={Status.Fire} hasLabel /></Bold> de <Bold>{mag / 5} <DisplayStatus status={Status.Fire} /></Bold> intensité.</Col>
         </Row>
         <Row>
           <Col><Bold>Sur personnage</Bold> : <DisplayAttack status={[{ value: 2, status: Status.Burning, }]} />.</Col>
@@ -192,6 +199,12 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   range: { min: 1, max: 3 },
   element: ElementId.Fire,
+  resume: (summary) => (
+    <span>
+      <AccuracyAttack accuracy={summary.magicAttack} />
+      <Badge pill><Bold>4x <DisplayStatus status={Status.Burning} /> PV <DisplayElement element={ElementId.Fire} /></Bold></Badge>
+    </span>
+  ),
   getDescription: () => {
     return (
       <>
@@ -212,12 +225,13 @@ export const magicScrolls: Talent[] = [{
   usageCost: 6,
   element: ElementId.Light,
   range: { min: 1, max: 1 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence * 1.5} modifier={{ damage: summary.magicPower }} element={ElementId.Light} />,
   getDescription: (summary) => (
     <>
       <Row>
         <Col><DisplayAttack
           element={ElementId.Light}
-          damage={{ value: Math.floor(getMagicPower(summary) * 1.5), type: DamageType.Magic }}
+          damage={{ value: Math.floor(summary.intelligence * 1.5) + summary.magicPower, type: DamageType.Magic }}
         /></Col>
       </Row>
       <Row>
@@ -232,6 +246,14 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   reusable: true,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <ResumeEffect
+      attack={summary.magicAttack}
+      damage={summary.intelligence}
+      modifier={{ damage: summary.magicPower }}
+      self={[{ value: 2, status: Status.Aegis }]}
+    />
+  ),
   getDescription: (summary) => {
     return (
       <>
@@ -250,6 +272,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Poisoned }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       status={[{ value: getMagicPower(summary) / 5, status: Status.Poisoned }]}
@@ -260,6 +283,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Bleeding }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       status={[{ value: getMagicPower(summary) / 5, status: Status.Bleeding }]}
@@ -270,6 +294,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Necrosis }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       status={[{ value: getMagicPower(summary) / 5, status: Status.Necrosis }]}
@@ -280,6 +305,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: "(distance x 3)",
   range: { min: 1, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
   getDescription: () => (
     <>
       <Row><Col>Echange sa position avec celle de la cible.</Col></Row>
@@ -293,15 +319,14 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   reusable: true,
   range: { min: 1, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ attack: 20, damage: summary.magicPower }} />,
   getDescription: (summary) => (
-    <Row>
-      <Col>
-        <DisplayAttack
-          damage={{ value: getMagicPower(summary), type: DamageType.Magic }}
-        />
-        <span> avec +20 de MM.</span>
-      </Col>
-    </Row>
+    <span>
+      <DisplayAttack
+        damage={{ value: getMagicPower(summary), type: DamageType.Magic }}
+      />
+      <span> avec +20 de MM.</span>
+    </span>
   ),
 }, {
   id: MagicScrollId.FrostBurst,
@@ -310,6 +335,7 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   reusable: true,
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Ice} status={[{ value: 2, status: Status.Freeze }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       element={ElementId.Ice}
@@ -323,6 +349,16 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
+  resume: (summary) => {
+    const value = getMagicPower(summary) / 10;
+    return (
+      <ResumeEffect
+        attack={summary.magicAttack}
+        status={[{ value, status: Status.Terror }]}
+        self={[{ value, status: Status.Will }]}
+      />
+    )
+  },
   getDescription: (summary) => {
     const value = getMagicPower(summary) / 10;
     return (
@@ -340,7 +376,8 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
-  getDescription: (summary) => (
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
+  getDescription: () => (
     <Row>
       <Col>Deplace la cible <Bold>vers une case vide adjacente.</Bold></Col>
     </Row>
@@ -351,6 +388,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
   getDescription: (summary) => {
     return (
       <>
@@ -370,6 +408,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Endurance }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Endurance }]}
@@ -381,6 +420,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Force }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Force }]}
@@ -392,6 +432,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Will }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Will }]}
@@ -403,6 +444,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Aegis }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Aegis }]}
@@ -415,6 +457,7 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   range: { min: 0, max: 3 },
   reusable: true,
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Exalted }]} />,
   getDescription: (summary) => (
     <>
       <DisplaySupport
@@ -429,6 +472,15 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 3 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <HealStatus
+        blocked={Math.floor(summary.intelligence / 2) + summary.magicPower}
+        base={summary.intelligence + summary.magicPower}
+        critical={Math.floor(summary.intelligence * 1.5) + summary.magicPower} />
+    </span>
+  ),
   getDescription: (summary) => (
     <span>Soigne <Bold>{getMagicPower(summary)} PV</Bold></span>
   )
@@ -438,6 +490,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Hability }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Hability }]}
@@ -449,6 +502,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: 4, status: Status.Furtivity }]} />,
   getDescription: (summary) => (
     <>
       <DisplaySupport
@@ -464,6 +518,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Immunity }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Immunity }]}
@@ -475,6 +530,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Vivacious }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Vivacious }]}
@@ -486,6 +542,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Regeneration }]} />,
   getDescription: (summary) => (
     <DisplaySupport
       status={[{ value: getMagicPower(summary) / 5, status: Status.Regeneration }]}
@@ -498,6 +555,7 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   area: BoxType.Empty,
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} self={[{ value: 1, status: Status.Aegis }]} />,
   getDescription: () => (
     <>
       <Row>
@@ -516,16 +574,21 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   area: BoxType.Empty,
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
   getDescription: () => (
     <>
       <Row>
         <Col>Génère <Bold>des ronces</Bold> (dure environ 48h).</Col>
       </Row>
-      <Nav>
-        <NavItem>Entre sur une <Bold>case adjacente</Bold> inflige <Bold><DisplayStatus status={Status.Poisoned} hasLabel /></Bold></NavItem>
-        <NavItem><Bold>Arracher (1PA)</Bold> inflige <Bold>+4 <DisplayStatus status={Status.Poisoned} /></Bold></NavItem>
-      </Nav>
-      <DisplayTouch semiSuccess="Elément fragile (-1PA pour Détruire)." critical="Elément solide (+1PA pour Détruire)" />
+      <Row>
+        <List>
+          <li>Entrer sur une <Bold>case adjacente</Bold> inflige <Bold>+2 <DisplayStatus status={Status.Poisoned} /></Bold></li>
+          <li><Bold>Arracher (1PA)</Bold> inflige <Bold>+4 <DisplayStatus status={Status.Poisoned} /></Bold></li>
+        </List>
+      </Row>
+      <Row>
+        <DisplayTouch semiSuccess="Elément fragile (-1PA pour Détruire)." critical="Elément solide (+1PA pour Détruire)" />
+      </Row>
     </>
   ),
 }, {
@@ -535,14 +598,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 8,
   area: BoxType.Tree,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><Treant /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Transforme un arbre en un <Bold>Tréant</Bold>.</Col></Row>
+        <Row><Col>Transforme un arbre en un <Bold><Treant hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Tréant - Invocation majeur</Bold>
+            <Bold>Profil du <Treant hasLabel /> - Invocation majeur</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -573,12 +642,14 @@ export const magicScrolls: Talent[] = [{
             <Row>
               <Col><Bold>Attaque puissante</Bold></Col>
             </Row>
-            <DisplayTouch
-              critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
-              semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
-            />
           </CardBody>
         </Card >
+        <Row>
+          <DisplayTouch
+            critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
+            semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
+          />
+        </Row>
       </>
     )
   },
@@ -589,14 +660,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 8,
   area: BoxType.Rock,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><StoneGolem /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Transforme un rocher en un <Bold>Golem de pierre</Bold>.</Col></Row>
+        <Row><Col>Transforme un rocher en un <Bold><StoneGolem hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Golem de pierre - Invocation majeur</Bold>
+            <Bold>Profil du <StoneGolem hasLabel /> - Invocation majeur</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -609,7 +686,7 @@ export const magicScrolls: Talent[] = [{
               <Col>ESP : <Bold>{Math.floor(0.5 * mag)}</Bold></Col>
             </Row>
             <Row>
-              <Col>PRE : <Bold>{Math.floor(1 * mag)}</Bold></Col>
+              <Col>PRE : <Bold>{mag}</Bold></Col>
             </Row>
             <Row>
               <Col>ARM : <Bold>+6</Bold></Col>
@@ -623,12 +700,14 @@ export const magicScrolls: Talent[] = [{
             <Row>
               <Col><Bold><DisplayAttack status={[{ value: 1, status: Status.Stunned }]} /></Bold></Col>
             </Row>
-            <DisplayTouch
-              critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
-              semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
-            />
           </CardBody>
         </Card>
+        <Row>
+          <DisplayTouch
+            critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
+            semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
+          />
+        </Row>
       </>
     )
   },
@@ -639,16 +718,22 @@ export const magicScrolls: Talent[] = [{
   usageCost: 8,
   area: BoxType.CrystalWall,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><CrystalGuardian /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
         <Row>
-          <Col>Transforme un mur de cristal en un <Bold>Golem de cristal</Bold>.</Col>
+          <Col>Transforme un mur de cristal en un <Bold><CrystalGuardian hasLabel /></Bold>.</Col>
         </Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Golem de cristal - Invocation majeur</Bold>
+            <Bold>Profil du <CrystalGuardian hasLabel /> - Invocation majeur</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -664,13 +749,13 @@ export const magicScrolls: Talent[] = [{
               <Col>ESP : <Bold>{Math.floor(0.5 * mag)}</Bold></Col>
             </Row>
             <Row>
-              <Col>PRE : <Bold>Math.floor({1 * mag}</Bold></Col>
+              <Col>PRE : <Bold>{mag}</Bold></Col>
             </Row>
             <Row>
-              <Col>MM : <Bold>{1 * mag}</Bold></Col>
+              <Col>MM : <Bold>{mag}</Bold></Col>
             </Row>
             <Row>
-              <Col>DM : <Bold>{1 * mag}</Bold></Col>
+              <Col>DM : <Bold>{mag}</Bold></Col>
             </Row>
             <Row>
               <Col>MAG : <Bold>+4</Bold></Col>
@@ -693,12 +778,14 @@ export const magicScrolls: Talent[] = [{
             <Row>
               <Col><Bold>Résonnance</Bold>: les statuts positifs réçus sont également appliqués à son maître.</Col>
             </Row>
-            <DisplayTouch
-              critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
-              semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
-            />
           </CardBody>
         </Card>
+        <Row>
+          <DisplayTouch
+            critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
+            semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
+          />
+        </Row>
       </>
     )
   },
@@ -709,14 +796,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 8,
   area: BoxType.IceWall,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><IceElemental /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Transforme un mur de glace en un <Bold>Elementaire de glace</Bold>.</Col></Row>
+        <Row><Col>Transforme un mur de glace en un <Bold><IceElemental hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Elementaire de glace - Invocation majeur</Bold>
+            <Bold>Profil du <IceElemental hasLabel /> - Invocation majeur</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -760,12 +853,14 @@ export const magicScrolls: Talent[] = [{
                 <Bold><DisplayAttack status={[{ value: 1, status: Status.Freeze }]} /></Bold>
               </Col>
             </Row>
-            <DisplayTouch
-              critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
-              semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
-            />
           </CardBody >
         </Card >
+        <Row>
+          <DisplayTouch
+            critical={<span>Gagne <Bold>un trait</Bold> et les bonus listés <Italic>(Valeur de MAG non augmentée)</Italic></span>}
+            semiSuccess={(<span>Aucun effet (comme <Bold>Echec</Bold>)</span>)}
+          />
+        </Row>
       </>
     )
   },
@@ -776,14 +871,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   area: BoxType.Remains,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><Ghost /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Relève un <Bold>Fantôme</Bold>.</Col></Row>
+        <Row><Col>Relève un <Bold><Ghost hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Fantôme - Invocation mineure</Bold>
+            <Bold>Profil du <Ghost hasLabel /> - Invocation mineure</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -799,10 +900,10 @@ export const magicScrolls: Talent[] = [{
               <Col>ESP : <Bold>{Math.floor(0.4 * mag)}</Bold></Col>
             </Row>
             <Row>
-              <Col>PRE : <Bold>{1 * mag}</Bold>  </Col>
+              <Col>PRE : <Bold>{mag}</Bold>  </Col>
             </Row>
             <Row>
-              <Col>MM : <Bold>{1 * mag}</Bold>   </Col>
+              <Col>MM : <Bold>{mag}</Bold>   </Col>
             </Row>
             <Row>
               <Col>ESQ : <Bold>{Math.floor(0.5 * mag)}</Bold></Col>
@@ -841,14 +942,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   area: BoxType.Remains,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><Ghoul /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Relève une <Bold>Goule</Bold>.</Col></Row>
+        <Row><Col>Relève une <Bold><Ghoul hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil de la Goule - Invocation mineure</Bold>
+            <Bold>Profil de la <Ghoul hasLabel /> - Invocation mineure</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -861,7 +968,7 @@ export const magicScrolls: Talent[] = [{
               <Col>ESP : <Bold>{Math.floor(0.2 * mag)}</Bold></Col>
             </Row>
             <Row>
-              <Col>PRE : <Bold>{1 * mag}</Bold></Col>
+              <Col>PRE : <Bold>{mag}</Bold></Col>
             </Row>
             <Row>
               <Col><Bold>Vulnérabilité <DisplayElement element={ElementId.Light} hasLabel /> 30%</Bold></Col>
@@ -894,14 +1001,20 @@ export const magicScrolls: Talent[] = [{
   usageCost: 4,
   area: BoxType.Remains,
   range: { min: 1, max: 2 },
+  resume: (summary) => (
+    <span>
+      <ResumeEffect attack={summary.magicAttack} />
+      <Badge pill><Skeleton /></Badge>
+    </span>
+  ),
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
       <>
-        <Row><Col>Relève un <Bold>Squelette</Bold>.</Col></Row>
+        <Row><Col>Relève un <Bold><Skeleton hasLabel /></Bold>.</Col></Row>
         <Card>
           <CardHeader>
-            <Bold>Profil du Squelette - Invocation mineure</Bold>
+            <Bold>Profil du <Skeleton hasLabel /> - Invocation mineure</Bold>
           </CardHeader>
           <CardBody>
             <Row>
@@ -944,6 +1057,7 @@ export const magicScrolls: Talent[] = [{
   manaCost: true,
   usageCost: "(distance x 2)",
   range: { min: 1, max: 3 },
+  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
   getDescription: () => (
     <>
       <Row><Col>Se <Bold>téléporte</Bold> sur la case.</Col></Row>

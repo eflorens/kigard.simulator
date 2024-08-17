@@ -256,6 +256,7 @@ export function Summary() {
               area={talent.area}
               element={talent.element}
               required={talent.required}
+              resume={(typeof talent.resume === "function" && talent.resume(summary)) || talent.resume as (React.ReactNode | string)}
               description={talent.getDescription(summary)}
             />
           );

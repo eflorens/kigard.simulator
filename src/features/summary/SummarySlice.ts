@@ -53,6 +53,7 @@ export interface SummaryState extends Attributes {
   secondaryWeapon?: HandSummary;
   talents: { id: number, type: TalentType }[];
   inventory: { id: number, name: string }[];
+  gifts: GiftId[];
 }
 
 export const selectSummary = createSelector([selectEvolution, selectInventory], (evolution, inventory) => {
@@ -198,6 +199,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     memory: Math.floor((evolution.character.profile.mind + total.mind) / 5),
     mana: (evolution.character.profile.mind + total.mind) * 2,
     vitality: (evolution.character.profile.constitution + total.constitution) * 10,
+    gifts: evolution.character.breed.gifts,
     talents: [
       ...Object.entries(inventory?.magicScrolls.rightHand)
         .map((scroll) => (scroll[1] && { id: scroll[1], type: TalentType.MagicScroll }) || undefined)

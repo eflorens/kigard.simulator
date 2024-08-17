@@ -28,6 +28,7 @@ export enum Status {
   Exposed = 32,
   Freeze = 39,
   Will = 40,
+  Fire = 44,
 }
 
 export const allStatus = [{
@@ -117,6 +118,9 @@ export const allStatus = [{
 }, {
   id: Status.Will,
   name: "Volonté"
+}, {
+  id: Status.Fire,
+  name: "Incendie"
 }];
 
 export enum ElementId {
