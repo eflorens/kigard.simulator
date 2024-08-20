@@ -8,6 +8,12 @@ interface ShareItem {
   settingsId?: number[];
 }
 
+export enum InventoryHands {
+  TwoHands = "twoHands",
+  RightHand = "rightHand",
+  LeftHand = "leftHand"
+}
+
 export interface ShareInventory {
   head?: ShareItem;
   hands?: ShareItem;
@@ -31,31 +37,24 @@ export interface Inventory<T extends Item> {
   };
 }
 
-export interface OneItemPerHand {
-  leftHand?: Inventory<Weapon | Item>,
-  rightHand?: Inventory<Weapon | Item>
-}
-
 export interface InventoryLocation {
   head?: Inventory<Item>;
   bust?: Inventory<Item>;
-  hands?: Inventory<Weapon> | OneItemPerHand;
+  hands?: { hand: InventoryHands, item?: Inventory<Weapon | Item> }[];
   feet?: Inventory<Item>;
   fetish?: Inventory<Item>;
 }
 
 interface InventoryState extends InventoryLocation {
   magicScrolls: {
-    rightHand: { [index: number]: MagicScrollId },
-    leftHand: { [index: number]: MagicScrollId },
-  };
+    hand: InventoryHands,
+    index: number,
+    scroll: MagicScrollId
+  }[];
 }
 
 const initialState: InventoryState = {
-  magicScrolls: {
-    rightHand: [],
-    leftHand: [],
-  },
+  magicScrolls: [],
 };
 
 function computeSettingsOnItemChange<T extends Item>(current?: Inventory<T>, item?: T) {
@@ -79,11 +78,8 @@ function loadItem<T extends Item>(allItems: T[], shareItem?: ShareItem) {
   };
 }
 
-const loadMagicScrolls = (hand?: number[]) => {
-  return hand?.map((id, index) => ({ id, index })).reduce((previous, current) => {
-    previous[current.index] = current.id;
-    return previous;
-  }, {} as { [index: number]: MagicScrollId }) || {};
+const loadMagicScrolls = (hand: InventoryHands, scrolls?: number[]) => {
+  return scrolls?.map((scroll, index) => ({ scroll, hand, index })) ?? [];
 }
 
 const inventorySlice = createSlice({
@@ -96,28 +92,27 @@ const inventorySlice = createSlice({
       state.feet = loadItem(feet, action.payload.feet);
       state.fetish = loadItem(fetish, action.payload.fetish);
       if (!action.payload.hands) {
-        state.hands = {
-          leftHand: loadItem(hand, action.payload.leftHand),
-          rightHand: loadItem(hand, action.payload.rightHand),
-        }
-        state.magicScrolls = {
-          rightHand: loadMagicScrolls(action.payload.magicScrolls?.rightHand),
-          leftHand: loadMagicScrolls(action.payload.magicScrolls?.leftHand)
-        };
+        state.hands = [
+          { hand: InventoryHands.LeftHand, item: loadItem(hand, action.payload.leftHand) },
+          { hand: InventoryHands.RightHand, item: loadItem(hand, action.payload.rightHand) },
+        ]
+        state.magicScrolls = [
+          ...loadMagicScrolls(InventoryHands.RightHand, action.payload.magicScrolls?.rightHand),
+          ...loadMagicScrolls(InventoryHands.LeftHand, action.payload.magicScrolls?.leftHand)
+        ];
       }
       else {
-        state.hands = loadItem(twoHands, action.payload.hands);
+        state.hands = [{ hand: InventoryHands.TwoHands, item: loadItem(twoHands, action.payload.hands) }];
       }
     },
-    setMagicScrolls(state, action: PayloadAction<{ index: number, slot: "rightHand" | "leftHand", scroll: MagicScrollId }>) {
-      const { index, scroll, slot } = action.payload;
-      state.magicScrolls[slot][index] = scroll;
+    setMagicScrolls(state, action: PayloadAction<{ index: number, hand: InventoryHands, scroll?: MagicScrollId }>) {
+      const { index, scroll, hand } = action.payload;
+      state.magicScrolls = (scroll && [
+        ...state.magicScrolls.filter(s => s.index !== index || s.hand !== hand),
+        { index, scroll, hand }
+      ]) || state.magicScrolls.filter(s => s.index !== index || s.hand !== hand);
     },
-    unsetMagicScrolls(state, action: PayloadAction<{ slot: "rightHand" | "leftHand", index: number }>) {
-      const { index, slot } = action.payload;
-      delete state.magicScrolls[slot][index];
-    },
-    setEnchantment(state, action: PayloadAction<{ slot: keyof InventoryLocation, enchantment?: Modifier }>) {
+    setEnchantment(state, action: PayloadAction<{ slot: keyof Omit<InventoryLocation, "hands">, enchantment?: Modifier }>) {
       const slot = action.payload.slot;
       const current = state[slot] as Inventory<Item>;
 
@@ -127,31 +122,23 @@ const inventorySlice = createSlice({
         item: current?.item
       };
     },
-    setRightHandEnchantment(state, action: PayloadAction<{ enchantment?: Modifier }>) {
-      const current = state.hands as OneItemPerHand;
-
-      state.hands = {
-        rightHand: {
+    setHandEnchantment(state, action: PayloadAction<{ hand: InventoryHands, enchantment?: Modifier }>) {
+      const previous = state.hands?.find(h => h.hand === action.payload.hand);
+      const handItem = {
+        hand: action.payload.hand,
+        item: {
+          settings: previous?.item?.settings || {},
+          item: previous?.item?.item,
           enchantment: action.payload.enchantment,
-          settings: current?.rightHand?.settings || {},
-          item: current?.rightHand?.item
-        },
-        leftHand: current?.leftHand
+        }
       };
-    },
-    setLeftHandEnchantment(state, action: PayloadAction<{ enchantment?: Modifier }>) {
-      const current = state.hands as OneItemPerHand;
 
-      state.hands = {
-        leftHand: {
-          enchantment: action.payload.enchantment,
-          settings: current?.leftHand?.settings || {},
-          item: current?.leftHand?.item
-        },
-        rightHand: current?.rightHand
-      };
+      state.hands = handItem.hand === InventoryHands.TwoHands ? [handItem] : [
+        ...(state.hands?.filter(h => h.hand !== action.payload.hand && h.hand !== InventoryHands.TwoHands) || []),
+        handItem
+      ];
     },
-    setSettings(state, action: PayloadAction<{ slot: keyof InventoryLocation, settings: { first?: Modifier, second?: Modifier } }>) {
+    setSettings(state, action: PayloadAction<{ slot: keyof Omit<InventoryLocation, "hands">, settings: { first?: Modifier, second?: Modifier } }>) {
       const slot = action.payload.slot;
       const current = state[slot] as Inventory<Item>;
 
@@ -161,31 +148,23 @@ const inventorySlice = createSlice({
         item: current?.item
       };
     },
-    setRightHandSettings(state, action: PayloadAction<{ settings: { first?: Modifier, second?: Modifier } }>) {
-      const current = state.hands as OneItemPerHand;
-
-      state.hands = {
-        rightHand: {
-          enchantment: current?.rightHand?.enchantment,
+    setHandSettings(state, action: PayloadAction<{hand: InventoryHands, settings: { first?: Modifier, second?: Modifier } }>) {
+      const previous = state.hands?.find(h => h.hand === action.payload.hand);
+      const handItem = {
+        hand: action.payload.hand,
+        item: {
+          enchantment: previous?.item?.enchantment,
+          item: previous?.item?.item,
           settings: action.payload.settings,
-          item: current?.rightHand?.item
-        },
-        leftHand: current?.leftHand
+        }
       };
-    },
-    setLeftHandSettings(state, action: PayloadAction<{ settings: { first?: Modifier, second?: Modifier } }>) {
-      const current = state.hands as OneItemPerHand;
 
-      state.hands = {
-        leftHand: {
-          enchantment: current?.leftHand?.enchantment,
-          settings: action.payload.settings,
-          item: current?.leftHand?.item
-        },
-        rightHand: current?.rightHand
-      };
+      state.hands = handItem.hand === InventoryHands.TwoHands ? [handItem] : [
+        ...(state.hands?.filter(h => h.hand !== action.payload.hand && h.hand !== InventoryHands.TwoHands) || []),
+        handItem
+      ];
     },
-    equipItem(state, action: PayloadAction<{ slot: keyof InventoryLocation, item: Item }>) {
+    equipItem(state, action: PayloadAction<{ slot: keyof Omit<InventoryLocation, "hands">, item?: Item }>) {
       const slot = action.payload.slot;
       const item = action.payload.item;
       const current = state[slot] as Inventory<Item>;
@@ -196,95 +175,24 @@ const inventorySlice = createSlice({
         item: action.payload.item
       };
     },
-    unequipItem(state, action: PayloadAction<keyof InventoryLocation>) {
-      const slot = action.payload;
-      const current = state[slot] as Inventory<Item>;
-
-      state[slot] = {
-        enchantment: current?.enchantment,
-        settings: computeSettingsOnItemChange(current),
-      };
-    },
-    equipTwoHands(state, action: PayloadAction<Weapon>) {
-      const current = state.hands as Inventory<Weapon>;
-      const weapon = action.payload;
-
-      state.hands = {
-        enchantment: current?.enchantment,
-        settings: computeSettingsOnItemChange(current, weapon),
-        item: weapon,
-      };
-
-      state.magicScrolls = {
-        rightHand: [],
-        leftHand: [],
-      };
-    },
-    equipRightHand(state, action: PayloadAction<Weapon | Item>) {
-      const current = state.hands as OneItemPerHand;
-      state.hands = {
-        leftHand: current?.leftHand,
-        rightHand: {
-          enchantment: current?.rightHand?.enchantment,
-          settings: computeSettingsOnItemChange(current?.rightHand, action.payload),
-          item: action.payload
+    equipHand(state, action: PayloadAction<{hand: InventoryHands, item?: Weapon | Item}>) {
+      const previous = state.hands?.find(h => h.hand === action.payload.hand);
+      const handItem = {
+        hand: action.payload.hand,
+        item: {
+          enchantment: previous?.item?.enchantment,
+          settings: computeSettingsOnItemChange(previous?.item, action.payload.item) || {},
+          item: action.payload.item,
         }
       };
 
-      if (action.payload.magicalSpace) {
-        const rightHand = Array.from(Array(action.payload.magicalSpace).keys())
-          .map((_, index) => state.magicScrolls.rightHand[index]);
-        state.magicScrolls = {
-          rightHand,
-          leftHand: state.magicScrolls.leftHand,
-        };
-      }
-      else {
-        state.magicScrolls = {
-          rightHand: [],
-          leftHand: state.magicScrolls.leftHand,
-        };
-      }
-    },
-    unequipRightHand(state) {
-      state.hands = { ...state.hands, rightHand: undefined };
-      state.magicScrolls = {
-        rightHand: [],
-        leftHand: state.magicScrolls.leftHand,
-      };
-    },
-    equipLeftHand(state, action: PayloadAction<Weapon | Item>) {
-      const current = state.hands as OneItemPerHand;
-      state.hands = {
-        rightHand: current?.rightHand,
-        leftHand: {
-          enchantment: current?.leftHand?.enchantment,
-          settings: computeSettingsOnItemChange(current?.leftHand, action.payload),
-          item: action.payload
-        }
-      };
+      state.hands = handItem.hand === InventoryHands.TwoHands ? [handItem] : [
+        ...(state.hands?.filter(h => h.hand !== action.payload.hand && h.hand !== InventoryHands.TwoHands) || []),
+        handItem
+      ];
 
-      if (action.payload.magicalSpace) {
-        const leftHand = Array.from(Array(action.payload.magicalSpace).keys())
-          .map((_, index) => state.magicScrolls.leftHand[index]);
-        state.magicScrolls = {
-          leftHand,
-          rightHand: state.magicScrolls.rightHand,
-        };
-      }
-      else {
-        state.magicScrolls = {
-          leftHand: [],
-          rightHand: state.magicScrolls.rightHand,
-        };
-      }
-    },
-    unequipLeftHand(state) {
-      state.hands = { ...state.hands, leftHand: undefined };
-      state.magicScrolls = {
-        leftHand: [],
-        rightHand: state.magicScrolls.rightHand,
-      };
+      state.magicScrolls = action.payload.hand === InventoryHands.TwoHands ? []
+        : state.magicScrolls.filter(s => action.payload.item?.magicalSpace || s.hand !== action.payload.hand);
     },
   },
 });
@@ -292,20 +200,12 @@ const inventorySlice = createSlice({
 export const {
   load,
   setMagicScrolls,
-  unsetMagicScrolls,
   setEnchantment,
-  setRightHandEnchantment,
-  setLeftHandEnchantment,
+  setHandEnchantment,
   setSettings,
-  setRightHandSettings,
-  setLeftHandSettings,
+  setHandSettings,
   equipItem,
-  unequipItem,
-  equipTwoHands,
-  equipRightHand,
-  unequipRightHand,
-  equipLeftHand,
-  unequipLeftHand
+  equipHand,
 } = inventorySlice.actions;
 
 export const selectInventory = (state: { inventory: InventoryState }) => state.inventory;

@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Improvements, selectEvolution, TalentType } from "../evolution/evolutionSlice";
-import { Inventory, OneItemPerHand, selectInventory, ShareInventory } from "../inventory/inventorySlice";
+import { Inventory, InventoryHands, selectInventory, ShareInventory } from "../inventory/inventorySlice";
 import { BreedId } from "../../data/character";
 import { Item, Weapon } from "../../data/inventory";
 import { RootState } from "../../app/store";
@@ -8,8 +8,7 @@ import { RootState } from "../../app/store";
 export enum Tabs {
   Evolution = 1,
   Inventory = 2,
-  Talents = 3,
-  Summary = 4,
+  Summary = 3,
 }
 
 export interface Simulator {
@@ -75,9 +74,9 @@ export const selectCurrent = createSelector([selectEvolution, selectInventory], 
     };
   }
 
-  const leftHand = (inventory.hands as OneItemPerHand)?.leftHand;
-  const rightHand = (inventory.hands as OneItemPerHand)?.rightHand;
-  const hands = !leftHand && !rightHand ? inventory.hands as Inventory<Weapon> : undefined;
+  const leftHand = inventory.hands?.find(hand => hand.hand === InventoryHands.LeftHand)?.item;
+  const rightHand = inventory.hands?.find(hand => hand.hand === InventoryHands.RightHand)?.item;
+  const hands = inventory.hands?.find(hand => hand.hand === InventoryHands.TwoHands)?.item;
 
   const simulator: Simulator = {
     breed: breed,
@@ -104,11 +103,11 @@ export const selectCurrent = createSelector([selectEvolution, selectInventory], 
       feet: (inventory?.feet && share(inventory.feet)) || undefined,
       fetish: (inventory?.fetish && share(inventory.fetish)) || undefined,
       magicScrolls: {
-        rightHand: Object.entries(inventory?.magicScrolls.rightHand)
-          .map((scroll) => scroll[1])
+        rightHand: inventory?.magicScrolls.filter(scroll => scroll.hand === InventoryHands.RightHand)
+          .map((scroll) => scroll.scroll)
           .filter(scroll => !!scroll),
-        leftHand: Object.entries(inventory?.magicScrolls.leftHand)
-          .map((scroll) => scroll[1])
+        leftHand: inventory?.magicScrolls.filter(scroll => scroll.hand === InventoryHands.LeftHand)
+          .map((scroll) => scroll.scroll)
           .filter(scroll => !!scroll),
       }
     },

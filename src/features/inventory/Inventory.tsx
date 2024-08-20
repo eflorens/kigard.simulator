@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Bold, Col, DropdownList, ListGroup, ListGroupItem, Row } from "../../components";
 import { bust, allEnchantments, feet, fetish, head, Item, Modifier, hand, twoHands, Weapon, allSettings } from "../../data/inventory";
-import { Inventory as InventoryItem, equipItem, equipLeftHand, equipRightHand, InventoryLocation, selectInventory, setEnchantment, setLeftHandEnchantment, setLeftHandSettings, setRightHandEnchantment, setRightHandSettings, setSettings, unequipItem, unequipLeftHand, unequipRightHand, setMagicScrolls, unsetMagicScrolls } from "./inventorySlice";
+import { Inventory as InventoryItem, equipItem, equipHand, InventoryLocation, selectInventory, setEnchantment, setHandEnchantment, setSettings, setHandSettings, setMagicScrolls, InventoryHands } from "./inventorySlice";
 import { DisplayElementaryResistance } from "../../components/DisplayElementaryResistance";
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { DisplayItemImage } from "../../components/DisplayItemImage";
 import { DisplayElement } from "../../components/DisplayElement";
 import { Talent } from "../../data/talents";
-import { MagicScrollId, magicScrolls } from "../../data/magicScrolls";
+import { MagicScrollId, allMagicScrolls } from "../../data/magicScrolls";
 
 function DisplayAttributeItem({ item }: Readonly<{ item?: Item }>) {
   if (!item) {
@@ -69,7 +69,7 @@ function DisplayAttributeItem({ item }: Readonly<{ item?: Item }>) {
 
 }
 
-function DisplayItem<T extends Item>({ item, showDetails }: Readonly<{ item?: T, showDetails?: boolean }>) {
+export function DisplayItem<T extends Item>({ item, showDetails }: Readonly<{ item?: T, showDetails?: boolean }>) {
   if (!item) {
     return <span>Aucun</span>;
   }
@@ -91,7 +91,7 @@ interface ChooseItemProps<T extends Item> {
   onMagicScrollChange?: (index: number, scroll?: Talent) => void;
   source: T[];
   current?: InventoryItem<T>;
-  currentMagicScrolls?: { [index: number]: MagicScrollId };
+  currentMagicScrolls?: { hand: InventoryHands, index: number, scroll: MagicScrollId }[];
 }
 
 function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSettingsChange, onMagicScrollChange, source, current, currentMagicScrolls }: Readonly<ChooseItemProps<T>>) {
@@ -131,12 +131,12 @@ function ChooseItem<T extends Item>({ label, onChange, onEnchantmentChange, onSe
                 <Col sm="12" key={i}>
                   <DropdownList
                     hasEmpty
-                    source={magicScrolls}
+                    source={allMagicScrolls}
                     title="name"
                     render={item => item && <><DisplayItemImage id={52} name={item.name} /><span>{item.name}</span></>}
                     onChange={s => onMagicScrollChange && onMagicScrollChange(i, s)}
                     size="sm"
-                    value={currentMagicScrolls && magicScrolls.find(scroll => scroll.id === currentMagicScrolls[i])}
+                    value={currentMagicScrolls && allMagicScrolls.find(scroll => scroll.id === currentMagicScrolls.find(s => s.index === i)?.scroll)}
                     description="Aucun parchemin"
                     search
                   />
@@ -179,44 +179,32 @@ export function Inventory() {
   const inventory = useSelector(selectInventory);
   const dispatch = useDispatch();
 
-  const handleMagicScrollChange = (slot: "rightHand" | "leftHand", index: number, scroll?: Talent) => {
-    dispatch(scroll ? setMagicScrolls({ slot, index, scroll: scroll?.id }) : unsetMagicScrolls({ slot, index }));
+  const handleMagicScrollChange = (slot: InventoryHands, index: number, scroll?: Talent) => {
+    dispatch(setMagicScrolls({ hand: slot, index, scroll: scroll?.id }));
   }
 
-  const handleEnchantmentChange = (slot: keyof InventoryLocation, enchantment?: Modifier) => {
+  const handleEnchantmentChange = (slot: keyof Omit<InventoryLocation, "hands">, enchantment?: Modifier) => {
     dispatch(setEnchantment({ slot, enchantment }));
   }
 
-  const handleRightHandEnchantmentChange = (enchantment?: Modifier) => {
-    dispatch(setRightHandEnchantment({ enchantment }));
+  const handleHandEnchantmentChange = (hand: InventoryHands, enchantment?: Modifier) => {
+    dispatch(setHandEnchantment({ hand, enchantment }));
   }
 
-  const handleLeftHandEnchantmentChange = (enchantment?: Modifier) => {
-    dispatch(setLeftHandEnchantment({ enchantment }));
-  }
-
-  const handleSettingsChange = (slot: keyof InventoryLocation, settings: { first?: Modifier, second?: Modifier }) => {
+  const handleSettingsChange = (slot: keyof Omit<InventoryLocation, "hands">, settings: { first?: Modifier, second?: Modifier }) => {
     dispatch(setSettings({ slot, settings }));
   }
 
-  const handleRightHandSettingsChange = (settings: { first?: Modifier, second?: Modifier }) => {
-    dispatch(setRightHandSettings({ settings }));
+  const handleHandSettingsChange = (hand: InventoryHands, settings: { first?: Modifier, second?: Modifier }) => {
+    dispatch(setHandSettings({ hand, settings }));
   }
 
-  const handleLeftHandSettingsChange = (settings: { first?: Modifier, second?: Modifier }) => {
-    dispatch(setLeftHandSettings({ settings }));
+  const handleItemChange = (slot: keyof Omit<InventoryLocation, "hands">, item?: Item) => {
+    dispatch(equipItem({ slot, item }));
   }
 
-  const handleItemChange = (slot: keyof InventoryLocation, item?: Item) => {
-    dispatch(item ? equipItem({ slot, item }) : unequipItem(slot));
-  }
-
-  const handleRightHandChange = (item?: Weapon | Item) => {
-    dispatch(item ? equipRightHand(item) : unequipRightHand());
-  }
-
-  const handleLeftHandChange = (item?: Weapon | Item) => {
-    dispatch(item ? equipLeftHand(item) : unequipLeftHand());
+  const handleHandChange = (hand: InventoryHands, item?: Weapon | Item) => {
+    dispatch(equipHand({ hand, item}));
   }
 
   return (
@@ -231,31 +219,31 @@ export function Inventory() {
       />
       <ChooseItem
         label="Deux mains"
-        onChange={item => handleItemChange('hands', item)}
-        onEnchantmentChange={e => handleEnchantmentChange('hands', e)}
-        onSettingsChange={s => handleSettingsChange('hands', s)}
+        onChange={item => handleHandChange(InventoryHands.TwoHands, item)}
+        onEnchantmentChange={e => handleHandEnchantmentChange(InventoryHands.TwoHands, e)}
+        onSettingsChange={s => handleHandSettingsChange(InventoryHands.TwoHands, s)}
         source={twoHands}
-        current={inventory.hands as InventoryItem<Weapon>}
+        current={inventory.hands?.find(h => h.hand === InventoryHands.TwoHands)?.item}
       />
       <ChooseItem
         label="Main droite"
-        onChange={item => handleRightHandChange(item)}
-        onEnchantmentChange={e => handleRightHandEnchantmentChange(e)}
-        onSettingsChange={s => handleRightHandSettingsChange(s)}
-        onMagicScrollChange={(index, talent) => handleMagicScrollChange("rightHand", index, talent)}
+        onChange={item => handleHandChange(InventoryHands.RightHand, item)}
+        onEnchantmentChange={e => handleHandEnchantmentChange(InventoryHands.RightHand, e)}
+        onSettingsChange={s => handleHandSettingsChange(InventoryHands.RightHand, s)}
+        onMagicScrollChange={(index, talent) => handleMagicScrollChange(InventoryHands.RightHand, index, talent)}
         source={hand}
-        current={inventory.hands && "rightHand" in inventory.hands ? inventory.hands.rightHand : undefined}
-        currentMagicScrolls={inventory.magicScrolls.rightHand}
+        current={inventory.hands?.find(h => h.hand === InventoryHands.RightHand)?.item}
+        currentMagicScrolls={inventory.magicScrolls?.filter(h => h.hand === InventoryHands.RightHand)}
       />
       <ChooseItem
         label="Main gauche"
-        onChange={item => handleLeftHandChange(item)}
-        onEnchantmentChange={e => handleLeftHandEnchantmentChange(e)}
-        onSettingsChange={s => handleLeftHandSettingsChange(s)}
-        onMagicScrollChange={(index, talent) => handleMagicScrollChange("leftHand", index, talent)}
+        onChange={item => handleHandChange(InventoryHands.LeftHand, item)}
+        onEnchantmentChange={e => handleHandEnchantmentChange(InventoryHands.LeftHand, e)}
+        onSettingsChange={s => handleHandSettingsChange(InventoryHands.LeftHand, s)}
+        onMagicScrollChange={(index, talent) => handleMagicScrollChange(InventoryHands.LeftHand, index, talent)}
         source={hand}
-        current={inventory.hands && "leftHand" in inventory.hands ? inventory.hands.leftHand : undefined}
-        currentMagicScrolls={inventory.magicScrolls.leftHand}
+        current={inventory.hands?.find(h => h.hand === InventoryHands.LeftHand)?.item}
+        currentMagicScrolls={inventory.magicScrolls?.filter(h => h.hand === InventoryHands.LeftHand)}
       />
       <ChooseItem
         label="Buste"

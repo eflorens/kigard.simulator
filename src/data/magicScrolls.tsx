@@ -53,7 +53,7 @@ export enum MagicScrollId {
 
 const getMagicPower = (summary: SummaryState) => (summary.magicPower + summary.intelligence);
 
-export const magicScrolls: Talent[] = [{
+export const allMagicScrolls: Talent[] = [{
   id: MagicScrollId.FireBall,
   name: "Boule de feu",
   reusable: true,

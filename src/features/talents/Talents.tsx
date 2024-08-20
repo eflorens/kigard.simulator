@@ -2,44 +2,40 @@ import { useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { CardGroup, DropdownList } from "../../components";
 import { DisplayItemImage } from "../../components/DisplayItemImage";
-import { magicScrolls } from "../../data/magicScrolls";
-import { techniques } from "../../data/techniques";
+import { allMagicScrolls } from "../../data/magicScrolls";
+import { allTechniques } from "../../data/techniques";
 import { selectEvolution, setTalent, TalentType } from "../evolution/evolutionSlice";
 import { DisplayTalent } from "./DisplayTalent";
 import { selectSummary } from "../summary/SummarySlice";
 import { Talent } from "../../data/talents";
 
-interface TalentProps extends Talent {
-  type: TalentType;
-}
-
-function ChooseTalent({ index, talent, source, onChange }
-    : Readonly<{ index: number, talent?: TalentProps, source: TalentProps[], onChange: (index: number, talent?: { id: number, type: TalentType }) => void }>) {
+export function ChooseTalent<T extends Talent>({ index, description, talent, source, onChange }
+    : Readonly<{ index: number, description: string, talent?: T, source: T[], onChange: (index: number, talent?: T) => void }>) {
   return <DropdownList
     hasEmpty
     source={source}
     title="name"
     render={item => item && <><DisplayItemImage id={52} name={item.name} /><span>{item.name}</span></>}
-    onChange={t => onChange(index, t && { id: t.id, type: t.type })}
+    onChange={t => onChange(index, t)}
     size="sm"
     value={talent}
-    description="Aucun parchemin"
+    description={description}
     search />;
 }
 
-function DisplayTalents() {
+export function Talents() {
   const { talents, experience: { rank } } = useAppSelector(selectEvolution);
   const summary = useAppSelector(selectSummary);
   const dispatch = useAppDispatch();
 
-  const onChange = (index: number, talent?: { id: number, type: TalentType }) => {
+  const onTalentChange = (index: number, talent?: Talent & { type: TalentType}) => {
     dispatch(setTalent({ index, talent }));
   }
 
   const allTalents = useMemo(() => {
     return [
-      ...techniques.map(t => ({ ...t, type: TalentType.Technique })),
-      ...magicScrolls.map(t => ({ ...t, type: TalentType.MagicScroll }))
+      ...allTechniques.map(t => ({ ...t, type: TalentType.Technique })),
+      ...allMagicScrolls.map(t => ({ ...t, type: TalentType.MagicScroll }))
     ];
   }, []);
 
@@ -52,7 +48,7 @@ function DisplayTalents() {
         return (
           <DisplayTalent
             key={index}
-            title={<ChooseTalent index={index} talent={talent} source={allTalents} onChange={onChange} />}
+            title={<ChooseTalent index={index} description="Choisir une technique" talent={talent} source={allTalents} onChange={onTalentChange} />}
             hideSubTitle={!talent}
             usageCost={talent?.usageCost && ((typeof talent.usageCost === "function" && talent.usageCost(summary)) || talent.usageCost as (number | string))}
             manaCost={talent?.manaCost}
@@ -68,8 +64,4 @@ function DisplayTalents() {
       })}
     </CardGroup>
   );
-}
-
-export function Talents() {
-  return <DisplayTalents />
 }

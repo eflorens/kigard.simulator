@@ -1,8 +1,9 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { selectEvolution, TalentType } from "../evolution/evolutionSlice";
-import { Inventory, InventoryLocation, OneItemPerHand, selectInventory } from "../inventory/inventorySlice";
+import { selectEvolution } from "../evolution/evolutionSlice";
+import { Inventory, InventoryHands, InventoryLocation, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, ItemStatus, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
+import { MagicScrollId } from "../../data/magicScrolls";
 
 interface Attributes {
   strength: number;
@@ -51,7 +52,8 @@ export interface SummaryState extends Attributes {
   regeneration: number;
   primaryWeapon?: HandSummary;
   secondaryWeapon?: HandSummary;
-  talents: { id: number, type: TalentType }[];
+  magicScrolls: { scroll: MagicScrollId, index: number, hand: InventoryHands }[];
+  hands: { hand: InventoryHands, item?: Inventory<Weapon | Item> }[];
   inventory: { id: number, name: string }[];
   gifts: GiftId[];
 }
@@ -104,7 +106,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       value: 0,
       element: ElementId.Wind
     }];
-    
+
     const applyEnchantment = (item: Item | Weapon, enchantment: Modifier) => {
       return (item.enhancedEnchantment && [enchantment, enchantment]) || [enchantment];
     }
@@ -115,26 +117,37 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
       }
 
       const enchantments = (enchantment && applyEnchantment(item, enchantment)) || [];
-      
+
       const settingCollection = [settings.first, settings.second]
         .filter(setting => !!setting);
 
       return [...enchantments, ...settingCollection];
     }
 
-    type ItemSlot = keyof InventoryLocation | "leftHand" | "rightHand";
+    type ItemSlot = keyof InventoryLocation | "rightHand" | "leftHand";
 
     const items = (Object.keys(inventory) as (keyof InventoryLocation)[])
       .map(slot => {
-        return { slot: slot as ItemSlot, item: inventory[slot] as Inventory<Item | Weapon> };
-      });
-    const itemPerHand = inventory.hands as OneItemPerHand;
-    if (itemPerHand?.rightHand) {
-      items.push({ slot: "rightHand", item: itemPerHand.rightHand });
-    }
-    if (itemPerHand?.leftHand) {
-      items.push({ slot: "leftHand", item: itemPerHand.leftHand });
-    }
+        if (slot === "hands") {
+          const items: { slot: ItemSlot, item: Inventory<Item | Weapon> }[] = [];
+
+          const twoHands = inventory.hands?.find(hand => hand.hand === InventoryHands.TwoHands)?.item;
+          if (twoHands) {
+            items.push({ slot: "hands", item: twoHands });
+          }
+          const rightHand = inventory.hands?.find(hand => hand.hand === InventoryHands.RightHand)?.item;
+          if (rightHand) {
+            items.push({ slot: "rightHand", item: rightHand });
+          }
+          const leftHand = inventory.hands?.find(hand => hand.hand === InventoryHands.LeftHand)?.item;
+          if (leftHand) {
+            items.push({ slot: "leftHand", item: leftHand });
+          }
+          return items;
+        }
+        return [{ slot: slot as ItemSlot, item: inventory[slot] as Inventory<Item | Weapon> }];
+      })
+      .reduce((previous, current) => previous.concat(current), []);
 
     const modifiers = items
       .map(({ item }) => getModifiers(item))
@@ -200,21 +213,16 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     mana: (evolution.character.profile.mind + total.mind) * 2,
     vitality: (evolution.character.profile.constitution + total.constitution) * 10,
     gifts: evolution.character.breed.gifts,
-    talents: [
-      ...Object.entries(inventory?.magicScrolls.rightHand)
-        .map((scroll) => (scroll[1] && { id: scroll[1], type: TalentType.MagicScroll }) || undefined)
-        .filter(scroll => !!scroll),
-      ...Object.entries(inventory?.magicScrolls.leftHand)
-        .map((scroll) => (scroll[1] && { id: scroll[1], type: TalentType.MagicScroll }) || undefined)
-        .filter(scroll => !!scroll),
-      ...Object.entries(evolution.talents).map(talent => talent[1]).filter(talent => !!talent),
-    ],
+    magicScrolls: inventory?.magicScrolls,
+    hands: inventory?.hands || [],
   };
   const getBaseDamage = (weapon: Weapon) => (!weapon.range || weapon.range.max === 1)
     ? summary.strength
     : summary.dexterity;
 
-  const weapon = ((inventory.hands as OneItemPerHand)?.rightHand?.item as Weapon | undefined) || (inventory.hands as Inventory<Weapon>)?.item;
+  const weapon = (inventory.hands?.find(hand => hand.hand === InventoryHands.TwoHands)
+    ?? inventory.hands?.find(hand => hand.hand === InventoryHands.RightHand))?.item?.item as Weapon | undefined;
+
   const primaryWeapon: HandSummary | undefined = weapon && {
     id: weapon.id,
     name: weapon.name,
@@ -230,7 +238,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
     range: weapon.range || { min: 1, max: 1 },
   };
 
-  const leftWeapon = (inventory.hands as OneItemPerHand)?.leftHand?.item as Weapon | undefined;
+  const leftWeapon = inventory.hands?.find(hand => hand.hand === InventoryHands.LeftHand)?.item?.item as Weapon | undefined;
   const isLeftHand = leftWeapon?.id === 311;
   const secondaryWeapon: HandSummary | undefined = leftWeapon && {
     id: leftWeapon.id,

@@ -1,17 +1,20 @@
 
 import { Fragment } from 'react/jsx-runtime';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Badge, Bold, Card, CardBody, CardGroup, CardHeader, Col, Container, Progress, Row } from '../../components';
-import { HandSummary, selectSummary } from './SummarySlice';
+import { HandSummary, selectSummary, SummaryState } from './SummarySlice';
 import { DisplayElementaryResistance } from '../../components/DisplayElementaryResistance';
 import { DisplayElement } from '../../components/DisplayElement';
 import { DisplayStatus } from '../../components/DisplayStatus';
 import { DisplayItemImage } from '../../components/DisplayItemImage';
 import { DisplayBreed } from '../evolution/DisplayBreed';
 import { DisplayTalent } from '../talents/DisplayTalent';
-import { magicScrolls } from '../../data/magicScrolls';
-import { TalentType } from '../evolution/evolutionSlice';
-import { techniques } from '../../data/techniques';
+import { allMagicScrolls, MagicScrollId } from '../../data/magicScrolls';
+import { ChooseTalent, Talents } from '../talents/Talents';
+import { DisplayItem } from '../inventory/Inventory';
+import { Talent } from '../../data/talents';
+import { InventoryHands, setMagicScrolls } from '../inventory/inventorySlice';
+import { Item, Weapon } from '../../data/inventory';
 
 interface AttributeProps {
   label: string;
@@ -58,8 +61,8 @@ function DisplayInventory(props: React.DetailedHTMLProps<React.HTMLAttributes<HT
 
   return (
     <span {...props}>
-      {inventory.map(({ id, name }) => (
-        <span key={id} className="me-1">
+      {inventory.map(({ id, name }, index) => (
+        <span key={index} className="me-1">
           <DisplayItemImage id={id} name={name} />
         </span>
       ))}
@@ -153,10 +156,53 @@ function DisplayWeapons() {
   );
 }
 
-export function Summary() {
+interface MagicHandProps {
+  hand: InventoryHands;
+  item: Weapon | Item;
+  magicScrolls: { scroll: MagicScrollId; index: number; hand: InventoryHands; }[];
+  onMagicScrollChange: (index: number, hand: InventoryHands, scroll?: Talent) => void;
+  summary: SummaryState;
+}
 
+function MagicHand({ hand, item, magicScrolls, onMagicScrollChange, summary }: Readonly<MagicHandProps>) {
+  return (
+    <Card key={hand}>
+      <CardHeader><Bold><DisplayItem item={item}></DisplayItem></Bold></CardHeader>
+      <CardBody>
+        <CardGroup className="group-col-2">
+          {Array.from(Array(item.magicalSpace).keys()).map((_, index) => {
+            const scroll = magicScrolls.find(ms => ms.index === index);
+            const magicScroll = scroll && allMagicScrolls.find(ms => ms.id === scroll.scroll);
+
+            return (
+              <DisplayTalent
+                key={magicScroll?.id}
+                title={<ChooseTalent index={index} description="Choisir un sortilège" talent={magicScroll} source={allMagicScrolls} onChange={(index, talent) => onMagicScrollChange(index, hand, talent)} />}
+                usageCost={magicScroll && ((typeof magicScroll.usageCost === "function" && magicScroll.usageCost(summary)) || magicScroll.usageCost as (number | string))}
+                manaCost={magicScroll?.manaCost}
+                reusable={magicScroll?.reusable}
+                range={magicScroll && ((typeof magicScroll.range === "function" && magicScroll.range(summary)) || magicScroll.range as { min: number; max: number; })}
+                area={magicScroll?.area}
+                element={magicScroll?.element}
+                required={magicScroll?.required}
+                resume={magicScroll && ((typeof magicScroll.resume === "function" && magicScroll.resume(summary)) || magicScroll.resume as (React.ReactNode | string))}
+                description={magicScroll?.getDescription(summary)} />
+            );
+          })}
+        </CardGroup>
+      </CardBody>
+    </Card>
+  );
+}
+
+export function Summary() {
   const summary = useAppSelector(selectSummary);
-  const { talents } = summary;
+  const dispatch = useAppDispatch();
+  const { magicScrolls } = summary;
+
+  const onMagicScrollChange = (index: number, hand: InventoryHands, scroll?: Talent) => {
+    dispatch(setMagicScrolls({ index, hand, scroll: scroll?.id }));
+  }
 
   return (
     <>
@@ -239,29 +285,26 @@ export function Summary() {
               </span>))}
           </CardBody>
         </Card>
-        {talents.map(t => {
-          const talent = (t.type === TalentType.MagicScroll && magicScrolls.find(talent => talent.id === t.id))
-            || (t.type === TalentType.Technique && techniques.find(talent => talent.id === t.id));
-          if (!talent) {
+      </CardGroup>
+      <CardGroup>
+        {summary.hands.map(({hand, item}) => {
+          if (!item?.item?.magicalSpace) {
             return null;
           }
+
           return (
-            <DisplayTalent
-              key={talent.id}
-              title={talent.name}
-              usageCost={(typeof talent.usageCost === "function" && talent.usageCost(summary)) || talent.usageCost as (number | string)}
-              manaCost={talent.manaCost}
-              reusable={talent.reusable}
-              range={(typeof talent.range === "function" && talent.range(summary)) || talent.range as { min: number, max: number }}
-              area={talent.area}
-              element={talent.element}
-              required={talent.required}
-              resume={(typeof talent.resume === "function" && talent.resume(summary)) || talent.resume as (React.ReactNode | string)}
-              description={talent.getDescription(summary)}
+            <MagicHand
+              key={hand}
+              hand={hand}
+              item={item.item}
+              magicScrolls={magicScrolls.filter(scroll => scroll.hand === hand)}
+              onMagicScrollChange={onMagicScrollChange}
+              summary={summary}
             />
-          );
+          )
         })}
       </CardGroup>
+      <Talents />
     </>
   );
 }
