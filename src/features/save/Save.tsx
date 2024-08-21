@@ -1,40 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Badge, Col, Container, Input, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Tooltip } from "../../components";
-import { faArrowsRotate, faCopy, faGear, faRemove, faSave, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faArrowsRotate, faGear, faRemove, faSave, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useCallback, useEffect, useState } from "react";
 import { setToast } from "../toastr/toastSlice";
-import { removeBackup, saveBackup, selectCurrent, selectStore, setActiveTab, Simulator, Tabs } from "./saveSlice";
+import { decompress, removeBackup, saveBackup, selectCurrent, selectStore, setActiveTab, Simulator, Tabs } from "./saveSlice";
 import { setBreed, improve, setTalents } from "../evolution/evolutionSlice";
 import { load } from "../inventory/inventorySlice";
-import { SizeProp } from "@fortawesome/fontawesome-svg-core";
 import { BreedId } from "../../data/character";
+import { ShareButton } from "./ShareButton";
 
 interface BackupProps {
   name: string;
   simulator: Simulator;
   onRemove: (name: string) => void;
   loadSimulator: (simulator: Simulator) => void;
-}
-
-function ShareButton({ simulator, size }: Readonly<{ simulator: Simulator, size?: SizeProp }>) {
-  const dispatch = useAppDispatch();
-  const token = window.btoa(JSON.stringify(simulator));
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(`${window.location.origin}${process.env.PUBLIC_URL}?token=${token}`);
-
-    dispatch(setToast({
-      detail: "Lien de partage copié",
-      status: "success",
-    }));
-  };
-
-  return (<Tooltip description="Copier le lien">
-    <Badge pill role="button" onClick={() => copyToClipboard()}>
-      <FontAwesomeIcon size={size} icon={faCopy} />
-    </Badge>
-  </Tooltip>)
 }
 
 function SaveButton({ onClick }: Readonly<{ onClick: () => void }>) {
@@ -180,7 +160,8 @@ export function SavePanelButton() {
       return;
     }
 
-    const simulator = JSON.parse(window.atob(loadToken)) as Simulator;
+    const rawSimulator = window.atob(loadToken);
+    const simulator = rawSimulator.startsWith('{') ? JSON.parse(rawSimulator) as Simulator : decompress(rawSimulator);
     loadSimulator(simulator);
   }, [dispatch, loadSimulator]);
 

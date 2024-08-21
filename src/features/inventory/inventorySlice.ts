@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { allEnchantments, allSettings, bust, feet, fetish, hand, head, Item, Modifier, twoHands, Weapon } from '../../data/inventory';
 import { MagicScrollId } from '../../data/magicScrolls';
 
-interface ShareItem {
+export interface ShareItem {
   id: number;
   enchantmentId?: number;
   settingsId?: number[];
