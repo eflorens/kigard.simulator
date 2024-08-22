@@ -41,6 +41,8 @@ export const compress = (simulator: Simulator) => {
 
 export const decompress = (compressed: string): Simulator => {
   const [breed, improvements, inventory, talents] = compressed.split("|");
+  console.log(compressed);
+  console.log({ breed, improvements, inventory, talents });
   return {
     breed: Number(breed) as BreedId,
     improvements: decompressImprovements(improvements),
@@ -59,11 +61,11 @@ const decompressImprovements = (compressed: string): Improvements => {
 }
 
 const compressInventory = (inventory: ShareInventory) => {
-  return `${compressItem(inventory.head)}|${compressItem(inventory.hands)}|${compressItem(inventory.leftHand)}|${compressItem(inventory.rightHand)}|${compressItem(inventory.bust)}|${compressItem(inventory.feet)}|${compressItem(inventory.fetish)}|${inventory.magicScrolls?.rightHand.join(",")}|${inventory.magicScrolls?.leftHand.join(",")}`;
+  return `${compressItem(inventory.head)},${compressItem(inventory.hands)},${compressItem(inventory.leftHand)},${compressItem(inventory.rightHand)},${compressItem(inventory.bust)},${compressItem(inventory.feet)},${compressItem(inventory.fetish)},${inventory.magicScrolls?.rightHand.join("&")},${inventory.magicScrolls?.leftHand.join("&")}`;
 }
 
 const decompressInventory = (compressed: string): ShareInventory => {
-  const [head, hands, leftHand, rightHand, bust, feet, fetish, rightHandScrolls, leftHandScrolls] = compressed.split("|");
+  const [head, hands, leftHand, rightHand, bust, feet, fetish, rightHandScrolls, leftHandScrolls] = compressed.split(",");
   return {
     head: decompressItem(head),
     hands: decompressItem(hands),
@@ -73,14 +75,14 @@ const decompressInventory = (compressed: string): ShareInventory => {
     feet: decompressItem(feet),
     fetish: decompressItem(fetish),
     magicScrolls: {
-      rightHand: rightHandScrolls?.split(",").map(Number),
-      leftHand: leftHandScrolls?.split(",").map(Number),
+      rightHand: rightHandScrolls?.split("&").map(Number),
+      leftHand: leftHandScrolls?.split("&").map(Number),
     }
   };
 }
 
 const compressItem = (item?: ShareItem) => {
-  return (item && `${item.id},${item.enchantmentId},${item.settingsId?.join("$")}`) ?? "";
+  return (item && `${item.id}&${item.enchantmentId}&${item.settingsId?.join("$")}`) ?? "";
 }
 
 const decompressItem = (compressed?: string): ShareItem | undefined => {
@@ -88,7 +90,7 @@ const decompressItem = (compressed?: string): ShareItem | undefined => {
     return undefined;
   }
 
-  const [id, enchantmentId, settings] = compressed.split(",");
+  const [id, enchantmentId, settings] = compressed.split("&");
   return {
     id: Number(id),
     enchantmentId: Number(enchantmentId),
@@ -97,12 +99,12 @@ const decompressItem = (compressed?: string): ShareItem | undefined => {
 }
 
 const compressTalents = (talents: { id: number, type: TalentType }[]) => {
-  return talents.map(talent => `${talent.id},${talent.type}`).join("|");
+  return talents.map(talent => `${talent.id}&${talent.type}`).join(",");
 }
 
 const decompressTalents = (compressed: string): { id: number, type: TalentType }[] => {
-  return compressed.split("|").map(talent => {
-    const [id, type] = talent.split(",");
+  return compressed.split(",").map(talent => {
+    const [id, type] = talent.split("&");
     return { id: Number(id), type: Number(type) as TalentType };
   });
 }
