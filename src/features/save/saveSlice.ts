@@ -41,8 +41,6 @@ export const compress = (simulator: Simulator) => {
 
 export const decompress = (compressed: string): Simulator => {
   const [breed, improvements, inventory, talents] = compressed.split("|");
-  console.log(compressed);
-  console.log({ breed, improvements, inventory, talents });
   return {
     breed: Number(breed) as BreedId,
     improvements: decompressImprovements(improvements),

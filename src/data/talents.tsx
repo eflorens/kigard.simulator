@@ -2,9 +2,10 @@ import { faBullseye, faShieldHalved, faCircleDot, faBurst, faUser } from "@forta
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Badge, Bold } from "../components";
 import { DisplayStatus } from "../components/DisplayStatus";
-import { HandSummary, SummaryState } from "../features/summary/SummarySlice";
+import { HandSummary, selectSummary, SummaryState } from "../features/summary/SummarySlice";
 import { ElementId, Status } from "./inventory";
 import { DisplayElement } from "../components/DisplayElement";
+import { useAppSelector } from "../app/hooks";
 
 export enum DamageType {
   Pure,
@@ -77,14 +78,21 @@ export function DamageAttack({ className, blocked, base, critical, element }: Re
 export function ResumeEffect({ attack, damage, modifier, element, status, self }
   : { attack?: number, damage?: number, modifier?: { attack?: number, damage?: number }, element?: ElementId, status?: { value: number, status: Status }[], self?: { value: number, status: Status }[] }
 ) {
+  const summary = useAppSelector(selectSummary);
+
+  const elementaryAffinity = summary.primaryWeapon?.elementaryAffinity ?? summary.secondaryWeapon?.elementaryAffinity
+  const modifierWithAffinity = {
+    attack: addModifier(modifier?.attack ?? 0, elementaryAffinity && elementaryAffinity === element ? 10 : 0),
+    damage: addModifier(modifier?.damage ?? 0, elementaryAffinity && elementaryAffinity === element ? 2 : 0),
+  }
   return (
     <Bold>
-      {attack !== undefined && <AccuracyAttack accuracy={attack + (modifier?.attack ?? 0)} />}
+      {attack !== undefined && <AccuracyAttack accuracy={attack + (modifierWithAffinity?.attack ?? 0)} />}
       {damage !== undefined && (
         <DamageAttack
-          blocked={Math.floor(damage / 2) + (modifier?.damage ?? 0)}
-          base={Math.floor(damage) + (modifier?.damage ?? 0)}
-          critical={Math.floor(damage * 1.5) + (modifier?.damage ?? 0)}
+          blocked={Math.floor(damage / 2) + (modifierWithAffinity?.damage ?? 0)}
+          base={Math.floor(damage) + (modifierWithAffinity?.damage ?? 0)}
+          critical={Math.floor(damage * 1.5) + (modifierWithAffinity?.damage ?? 0)}
           element={element}
         />
       )}

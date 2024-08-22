@@ -81,7 +81,7 @@ function PrincipalWeaponAttack({ summary, modifier }: Readonly<{ summary: Summar
 // Generate collection of Talent from TechniqueId
 export const allTechniques: Talent[] = [{
   id: TechniqueId.Stun,
-  name: "Assomé",
+  name: "Assommer",
   usageCost: (summary) => getPrimaryWeaponUsageCost(summary, 2),
   range: getPrimaryWeaponRange,
   required: "Masse, gant ou Fusil",
