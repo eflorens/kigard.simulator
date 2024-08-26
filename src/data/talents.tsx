@@ -75,16 +75,28 @@ export function DamageAttack({ className, blocked, base, critical, element }: Re
   );
 }
 
-export function ResumeEffect({ attack, damage, modifier, element, status, self }
-  : { attack?: number, damage?: number, modifier?: { attack?: number, damage?: number }, element?: ElementId, status?: { value: number, status: Status }[], self?: { value: number, status: Status }[] }
-) {
+interface StatusProps {
+  value: number;
+  status: Status;
+}
+
+interface ResumeEffectProps {
+  attack?: number;
+  damage?: number;
+  modifier?: { attack?: number, damage?: number, status?: StatusProps[] };
+  element?: ElementId;
+  status?: StatusProps[];
+  self?: StatusProps[];
+}
+
+export function ResumeEffect({ attack, damage, modifier, element, status, self } : ResumeEffectProps) {
   const summary = useAppSelector(selectSummary);
 
   const elementaryAffinity = summary.primaryWeapon?.elementaryAffinity ?? summary.secondaryWeapon?.elementaryAffinity
-  const modifierWithAffinity = {
-    attack: addModifier(modifier?.attack ?? 0, elementaryAffinity && elementaryAffinity === element ? 10 : 0),
-    damage: addModifier(modifier?.damage ?? 0, elementaryAffinity && elementaryAffinity === element ? 2 : 0),
-  }
+  const modifierWithAffinity = (elementaryAffinity && elementaryAffinity === element && {
+    attack: addModifier(modifier?.attack ?? 0, 10),
+    damage: addModifier(modifier?.damage ?? 0, 2),
+  }) || modifier;
   return (
     <Bold>
       {attack !== undefined && <AccuracyAttack accuracy={attack + (modifierWithAffinity?.attack ?? 0)} />}
@@ -166,3 +178,4 @@ export interface Talent {
   resume: React.ReactNode | string | ((summary: SummaryState) => React.ReactNode | string);
   getDescription: (summary: SummaryState) => React.ReactNode | string;
 }
+export const getMagicPower = (summary: SummaryState) => (summary.magicPower + summary.intelligence);

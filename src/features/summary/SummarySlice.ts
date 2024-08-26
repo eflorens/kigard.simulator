@@ -3,7 +3,7 @@ import { selectEvolution } from "../evolution/evolutionSlice";
 import { Inventory, InventoryHands, InventoryLocation, selectInventory } from "../inventory/inventorySlice";
 import { ElementId, Item, ItemStatus, Modifier, Weapon } from "../../data/inventory";
 import { GiftId } from "../../data/character";
-import { MagicScrollId } from "../../data/magicScrolls";
+import { MagicScrollId } from "../../data/magicScrolls/MagicScrollId";
 
 interface Attributes {
   strength: number;

@@ -7,7 +7,8 @@ import { DisplayStatus } from "../../components/DisplayStatus";
 import { DisplayItemImage } from "../../components/DisplayItemImage";
 import { DisplayElement } from "../../components/DisplayElement";
 import { Talent } from "../../data/talents";
-import { MagicScrollId, allMagicScrolls } from "../../data/magicScrolls";
+import { allMagicScrolls } from "../../data/magicScrolls";
+import { MagicScrollId } from "../../data/magicScrolls/MagicScrollId";
 
 function DisplayAttributeItem({ item }: Readonly<{ item?: Item }>) {
   if (!item) {

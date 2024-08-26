@@ -39,10 +39,10 @@ export function DisplayDamage({ value, type, element }: DamageProps & { element?
 interface DisplayAttackProps {
   element?: ElementId;
   status?: { value: number, status: Status }[];
-  damage?: { value: number, type: DamageType };
+  baseDamage?: { value: number, type: DamageType };
 }
 
-export function DisplayAttack({ element, damage, status: attackStatus }: Readonly<DisplayAttackProps>) {
+export function DisplayAttack({ element, baseDamage: damage, status: attackStatus }: Readonly<DisplayAttackProps>) {
   return (
     <span>
       <span>
