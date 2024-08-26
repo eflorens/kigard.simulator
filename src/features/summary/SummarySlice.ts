@@ -184,7 +184,7 @@ export const selectSummary = createSelector([selectEvolution, selectInventory], 
   }
 
   const { total, elementaryResistances } = computeInventory(inventory);
-  const regeneration = (evolution.character.breed.gifts.some(gift => gift === GiftId.REGENERATION) ? (evolution.character.profile.constitution / 5) : 0)
+  const regeneration = (evolution.character.breed.gifts.some(gift => gift === GiftId.REGENERATION) ? (evolution.character.profile.constitution + total.constitution) / 5 : 0)
     + total.regeneration;
 
   const summary = {
