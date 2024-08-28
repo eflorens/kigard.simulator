@@ -10,11 +10,11 @@ export const ShieldBash: Talent = {
   usageCost: 3,
   range: { min: 1, max: 1 },
   required: "Bouclier (main gauche)",
-  resume: (summary) => <ResumeAttack weapon={summary?.secondaryWeapon} modifier={{ baseDamage: summary.constitution, forceWeapon: true }} />,
+  resume: (summary) => <ResumeAttack weapon={summary?.secondaryWeapon} modifier={{ baseDamage: summary.constitution, useAsWeapon: true }} />,
   getDescription: (summary) => (
     <span>
       <span>Attaque du bouclier avec <Bold>2 <DisplayStatus status={Status.Stunned} hasLabel /></Bold> </span>
-      <ResumeAttack weapon={summary?.secondaryWeapon} modifier={{ baseDamage: summary.constitution, forceWeapon: true }} />
+      <ResumeAttack weapon={summary?.secondaryWeapon} modifier={{ baseDamage: summary.constitution, useAsWeapon: true }} />
     </span>
   ),
 };

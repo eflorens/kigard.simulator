@@ -13,7 +13,7 @@ export const Freezing: Talent = {
   usageCost: 4,
   range: { min: 1, max: 3 },
   element: ElementId.Ice,
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} element={ElementId.Ice} status={[{ value: getMagicPower(summary) / 5, status: Status.Freeze }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} element={ElementId.Ice} status={[{ value: getMagicPower(summary) / 5, status: Status.Freeze }]} />,
   getDescription: (summary) => {
     return (
       <>

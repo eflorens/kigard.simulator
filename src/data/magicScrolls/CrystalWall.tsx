@@ -12,7 +12,7 @@ export const CrystalWall: Talent = {
   usageCost: 4,
   area: BoxType.Empty,
   range: { min: 1, max: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} self={[{ value: 1, status: Status.Aegis }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} self={[{ value: 1, status: Status.Aegis }]} />,
   getDescription: () => (
     <>
       <Row>

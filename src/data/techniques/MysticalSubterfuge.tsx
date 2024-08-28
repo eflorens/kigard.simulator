@@ -1,8 +1,7 @@
 import { TechniqueId } from "./TechniqueId";
-import { Badge, Bold } from "../../components";
-import { DisplayStatus } from "../../components/DisplayStatus";
 import { Status } from "../inventory";
-import { Talent } from "../talents";
+import { ResumeEffect, Talent } from "../talents";
+import { DisplaySupport } from "../../features/talents/DisplaySupport";
 
 export const MysticalSubterfuge: Talent = {
   id: TechniqueId.MysticalSubterfuge,
@@ -10,10 +9,6 @@ export const MysticalSubterfuge: Talent = {
   usageCost: 4,
   manaCost: true,
   area: "Soi-même",
-  resume: () => <Badge pill><Bold>+3 <DisplayStatus status={Status.MysticalSubterfuge} /></Bold></Badge>,
-  getDescription: () => (
-    <span>
-      <span>Confère <Bold>3 <DisplayStatus status={Status.MysticalSubterfuge} hasLabel /></Bold></span>
-    </span>
-  ),
+  resume: <ResumeEffect status={[{ value: 3, status: Status.MysticalSubterfuge }]} />,
+  getDescription: () => <DisplaySupport status={[{ value: 3, status: Status.MysticalSubterfuge }]} />,
 };

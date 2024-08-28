@@ -13,7 +13,7 @@ export const LifeDrain: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 2 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Dark} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Dark} />,
   getDescription: (summary) => (
     <>
       <Row>

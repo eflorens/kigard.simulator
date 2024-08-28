@@ -4,7 +4,7 @@ import { DefensiveAttack } from "./DefensiveAttack";
 import { HypnoticAttack } from "./HypnoticAttack";
 import { MysticAttack } from "./MysticAttack";
 import { HeavyAttack } from "./HeavyAttack";
-import { ShapAttack } from "./ShapAttack";
+import { PreciseAttack } from "./PreciseAttack";
 import { QuickAttack } from "./QuickAttack";
 import { SacredAttack } from "./SacredAttack";
 import { SneakAttack } from "./SneakAttack";
@@ -47,7 +47,7 @@ import { IncisiveAttack } from "./IncisiveAttack";
 
 
 export const allTechniques: Talent[] = [Stun, DefensiveAttack, HypnoticAttack, IncisiveAttack, MysticAttack,
-  HeavyAttack, ShapAttack, QuickAttack, SacredAttack, SneakAttack, Sweep, ShieldBash, Dislocate, Cut, Execute,
+  HeavyAttack, PreciseAttack, QuickAttack, SacredAttack, SneakAttack, Sweep, ShieldBash, Dislocate, Cut, Execute,
   ChainAttack, ProjectileLaunch, Devastate, Siphon, LongRangeShot, Torment, AthleticLeap, SuddenDisappearance,
   IgniteArrow, Incant, Inspire, FutureRead, DefensiveMeditation, BloodSacrifice, SetTrap, FirstAid,
   IntuitiveSearch, StimulatingTreatment, DevotedSupport, MysticalSubterfuge, MagicOverload, Protect,

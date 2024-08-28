@@ -11,7 +11,7 @@ export const Healing: Talent = {
   range: { min: 0, max: 3 },
   resume: (summary) => (
     <span>
-      <ResumeEffect attack={summary.magicAttack} />
+      <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} />
       <HealStatus
         blocked={Math.floor(summary.intelligence / 2) + summary.magicPower}
         base={summary.intelligence + summary.magicPower}

@@ -12,7 +12,7 @@ export const MagicStealing: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} />,
   getDescription: (summary) => {
     return (
       <>

@@ -10,7 +10,7 @@ export const Bewitchment: Talent = {
   usageCost: 4,
   range: { min: 1, max: 5 },
   reusable: true,
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: 2, status: Status.Bewitched }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: 2, status: Status.Bewitched }]} />,
   getDescription: () => (
     <DisplayAttack
       status={[{

@@ -12,7 +12,7 @@ export const Exaltation: Talent = {
   usageCost: 4,
   range: { min: 0, max: 3 },
   reusable: true,
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Exalted }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Exalted }]} />,
   getDescription: (summary) => (
     <>
       <DisplaySupport

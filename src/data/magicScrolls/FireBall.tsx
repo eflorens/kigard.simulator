@@ -11,7 +11,7 @@ export const FireBall: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Fire} status={[{ value: 2, status: Status.Burning }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Fire} status={[{ value: 2, status: Status.Burning }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       element={ElementId.Fire}

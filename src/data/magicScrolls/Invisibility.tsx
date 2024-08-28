@@ -11,7 +11,7 @@ export const Invisibility: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 2 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: 4, status: Status.Furtivity }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: 4, status: Status.Furtivity }]} />,
   getDescription: (summary) => (
     <>
       <DisplaySupport

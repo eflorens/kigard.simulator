@@ -1,5 +1,5 @@
 import { TechniqueId } from "./TechniqueId";
-import { Row, Bold, Italic } from "../../components";
+import { Row, Bold, Italic, DisplayModificator } from "../../components";
 import { Talent, BoxType } from "../talents";
 
 export const IgniteArrow: Talent = {
@@ -8,12 +8,12 @@ export const IgniteArrow: Talent = {
   usageCost: 2,
   range: { min: 0, max: 1 },
   area: [BoxType.Fire, "Soi-même"],
-  resume: (<></>),
+  resume: (<DisplayModificator id={45} name="Flèche enflammé" />),
   getDescription: (summary) => (
     <>
       <Row>
         <span>
-          <span>Consomme une flèche de l'inventaire et prépare une munition <Bold>flèche enflammée</Bold> pour 3 tours,</span>
+          <span>Consomme une flèche de l'inventaire et prépare une munition <DisplayModificator id={45} name="Flèche enflammé" /> pour 3 tours,</span>
           <span> qui sera automatiquement utilisée lors de la prochaine attaque avec l'arc à la place d'une flèche normale</span>
         </span>
       </Row>

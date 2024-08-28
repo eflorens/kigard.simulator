@@ -1,15 +1,15 @@
 import { TechniqueId } from "./TechniqueId";
-import { Badge, Bold, Row, List } from "../../components";
+import { Bold, Row, List } from "../../components";
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { Status } from "../inventory";
-import { Talent } from "../talents";
+import { ResumeEffect, Talent } from "../talents";
 
 export const Protect: Talent = {
   id: TechniqueId.Protect,
   name: "Protéger",
   usageCost: 2,
   range: { min: 1, max: 1 },
-  resume: () => <Badge pill><Bold><DisplayStatus status={Status.Protect} /></Bold></Badge>,
+  resume: () => <ResumeEffect status={[{ value: 0, status: Status.Protect}]} />,
   getDescription: () => (
     <>
       <Row>

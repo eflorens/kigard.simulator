@@ -10,7 +10,7 @@ export const Restraining: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 4 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Restrained }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Restrained }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       status={[{

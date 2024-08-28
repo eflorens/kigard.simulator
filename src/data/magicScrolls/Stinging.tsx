@@ -10,7 +10,7 @@ export const Stinging: Talent = {
   usageCost: 4,
   reusable: true,
   range: { min: 1, max: 2 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ attack: 20, damage: summary.magicPower }} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence} modifier={{ attack: 20, damage: summary.magicPower }} />,
   getDescription: (summary) => (
     <span>
       <DisplayAttack

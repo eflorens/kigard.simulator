@@ -7,7 +7,7 @@ export enum TechniqueId {
   IncisiveAttack = 4,
   MysticAttack = 5,
   HeavyAttack = 6,
-  ShapAttack = 7,
+  PreciseAttack = 7,
   QuickAttack = 8,
   SacredAttack = 9,
   SneakAttack = 10,

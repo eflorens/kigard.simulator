@@ -4,8 +4,8 @@ import { TechniqueId } from "./TechniqueId";
 import { Bold } from "../../components";
 import { Talent, ResumeAttack } from "../talents";
 
-export const ShapAttack: Talent = {
-  id: TechniqueId.ShapAttack,
+export const PreciseAttack: Talent = {
+  id: TechniqueId.PreciseAttack,
   name: "Attaque précise",
   usageCost: (summary) => getPrimaryWeaponUsageCost(summary, 2),
   range: getPrimaryWeaponRange,

@@ -14,7 +14,7 @@ export const CrystalSpear: Talent = {
   reusable: true,
   range: { min: 1, max: 2 },
   resume: (summary) => (
-    <ResumeEffect
+    <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon}
       attack={summary.magicAttack}
       damage={summary.intelligence}
       modifier={{ damage: summary.magicPower }}

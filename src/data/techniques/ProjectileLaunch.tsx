@@ -1,6 +1,7 @@
 import { TechniqueId } from "./TechniqueId";
 import { Bold, Row } from "../../components";
-import { Talent, AccuracyAttack, DamageAttack } from "../talents";
+import { Talent, ResumeAttack } from "../talents";
+import { DisplayItemImage } from "../../components/DisplayItemImage";
 
 export const ProjectileLaunch: Talent = {
   id: TechniqueId.ProjectileLaunch,
@@ -8,36 +9,64 @@ export const ProjectileLaunch: Talent = {
   usageCost: 3,
   range: { min: 1, max: 3 },
   resume: (summary) => {
-    const baseDamage = (summary.strength + summary.dexterity) / 2;
-
-    return (
-      <Bold>
-        <AccuracyAttack accuracy={summary.accuracy} />
-        <DamageAttack
-          className="mx-2"
-          blocked={Math.floor(baseDamage / 2)}
-          base={Math.floor(baseDamage)}
-          critical={Math.floor(baseDamage * 3 / 2)} />
-      </Bold>
-    );
+    const noWeapon = {
+      isWeapon: true,
+      baseAccuracy: 0,
+      accuracy: 0,
+      baseDamage: 0,
+      damage: 0,
+      range: { min: 1, max: 3 },
+    };
+    return <ResumeAttack weapon={noWeapon} modifier={{ baseDamage: (summary.strength + summary.dexterity) / 2 }} />
   },
   getDescription: (summary) => {
+    const noWeapon = {
+      isWeapon: true,
+      baseAccuracy: 0,
+      accuracy: 0,
+      baseDamage: 0,
+      damage: 0,
+      range: { min: 1, max: 3 },
+    };
     const baseDamage = (summary.strength + summary.dexterity) / 2;
+    const shuriken = {
+      isWeapon: true,
+      baseAccuracy: 0,
+      accuracy: 15,
+      baseDamage,
+      damage: 3,
+      range: { min: 1, max: 3 },
+    };
+    const dart = {
+      isWeapon: true,
+      baseAccuracy: 0,
+      accuracy: 0,
+      baseDamage,
+      damage: 6,
+      range: { min: 1, max: 3 },
+    };
     return (
       <>
         <Row>
-          <span>Attaque d'un <Bold>projectile</Bold> de l'inventaire</span>
-        </Row>
-        <Row>
           <span>
-            <span>Base de dégâts : </span>
-            <Bold>{Math.floor(baseDamage)} </Bold>
-            <Bold>[Bloqué : {Math.floor(baseDamage / 2)}] </Bold>
-            <Bold>[Critique : {Math.floor(baseDamage * 3 / 2)}] </Bold>
+            <span>Attaque d'un <Bold>projectile</Bold> de l'inventaire </span>
+            <ResumeAttack weapon={noWeapon} modifier={{ baseDamage }} />
           </span>
         </Row>
         <Row>
           <span>Le <Bold>projectile</Bold> sera considéré comme une arme</span>
+        </Row>
+        <Row>
+          <span>
+            <DisplayItemImage id={225} name="Shuriken" />
+            <ResumeAttack weapon={shuriken} modifier={{ baseDamage }} />
+          </span>
+        </Row>
+        <Row>
+          <span>
+            <DisplayItemImage id={188} name="Dard en fer" />
+            <ResumeAttack weapon={dart} modifier={{ baseDamage }} />
+          </span>
         </Row>
       </>
     );

@@ -11,7 +11,7 @@ export const Judgement: Talent = {
   usageCost: 6,
   element: ElementId.Light,
   range: { min: 1, max: 1 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence * 1.5} modifier={{ damage: summary.magicPower }} element={ElementId.Light} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence * 1.5} modifier={{ damage: summary.magicPower }} element={ElementId.Light} />,
   getDescription: (summary) => (
     <>
       <Row>

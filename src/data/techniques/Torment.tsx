@@ -1,8 +1,6 @@
-import { getPrimaryWeaponUsageCost } from "../PrimaryWeapon";
+import { getPrimaryWeaponUsageCost, PrincipalWeaponAttack } from "../PrimaryWeapon";
 import { TechniqueId } from "./TechniqueId";
 import { Row, Bold } from "../../components";
-import { DisplayElement } from "../../components/DisplayElement";
-import { DisplayStatus } from "../../components/DisplayStatus";
 import { ElementId, Status } from "../inventory";
 import { Talent, ResumeAttack } from "../talents";
 
@@ -12,15 +10,11 @@ export const Torment: Talent = {
   usageCost: getPrimaryWeaponUsageCost,
   range: { min: 1, max: 1 },
   manaCost: true,
-  resume: (summary) => <ResumeAttack weapon={summary?.primaryWeapon} />,
+  resume: (summary) => <ResumeAttack weapon={summary?.primaryWeapon} element={ElementId.Dark} modifier={{ status: [{ value: 3, status: Status.Terror }] }} />,
   getDescription: (summary) => (
     <>
       <Row>
-        <span>
-          <span>Attaque de <DisplayElement element={ElementId.Dark} hasLabel /> de l'arme principale </span>
-          <ResumeAttack weapon={summary?.primaryWeapon} />
-          <span> avec <Bold>3<DisplayStatus status={Status.Terror} hasLabel /></Bold></span>
-        </span>
+        <PrincipalWeaponAttack summary={summary} element={ElementId.Dark} modifier={{ status: [{ value: 3, status: Status.Terror }] }} />
       </Row>
       <Row>
         <span>Chaque niveau de <Bold>Terreur</Bold> déjà existant donne <Bold>+5 de Précision (maximum +30)</Bold></span>

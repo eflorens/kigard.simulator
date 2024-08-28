@@ -2,10 +2,9 @@ import { faBullseye, faShieldHalved, faCircleDot, faBurst, faUser } from "@forta
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Badge, Bold } from "../components";
 import { DisplayStatus } from "../components/DisplayStatus";
-import { HandSummary, selectSummary, SummaryState } from "../features/summary/SummarySlice";
+import { HandSummary, SummaryState } from "../features/summary/SummarySlice";
 import { ElementId, Status } from "./inventory";
 import { DisplayElement } from "../components/DisplayElement";
-import { useAppSelector } from "../app/hooks";
 
 export enum DamageType {
   Pure,
@@ -29,18 +28,36 @@ export type AreaType = BoxType | {
 
 export type Range = { min: number, max: number } | "Portée Arme" | "Portée Arme + 1";
 
-export interface WeaponModifier {
+export interface AttackModifier {
   baseDamage?: number;
   baseAccuracy?: number;
   criticalFactor?: number;
   accuracy?: number;
   damage?: number;
-  forceWeapon?: boolean;
+  useAsWeapon?: boolean;
+  status?: StatusProps[];
+  self?: StatusProps[];
 }
 
 type LightWeapon = Omit<HandSummary, "id" | "name" | "usageCost" | "elementaryAffinity">;
 
 export const addModifier = (value: number, modifier?: number) => value + (modifier ?? 0);
+
+export const aggregateStatus = (first?: StatusProps[], second?: StatusProps[]) =>
+  [...(first || []), ...(second || [])]
+    .reduce((previous, current) => {
+      const previousStatus = previous.find(s => s.status === current.status);
+      if (previousStatus) {
+        return [
+          ...previous.filter(s => s.status !== current.status),
+          {
+            value: previousStatus.value + current.value,
+            status: current.status
+          }
+        ]
+      }
+      return [...previous, current];
+    }, [] as StatusProps[]);
 
 export function AccuracyAttack({ className, accuracy }: Readonly<{ className?: string, accuracy: number }>) {
   return (
@@ -81,22 +98,25 @@ interface StatusProps {
 }
 
 interface ResumeEffectProps {
+  primaryWeapon?: HandSummary;
+  secondaryWeapon?: HandSummary;
   attack?: number;
   damage?: number;
-  modifier?: { attack?: number, damage?: number, status?: StatusProps[] };
+  modifier?: { attack?: number, damage?: number, status?: StatusProps[], self?: StatusProps[] };
   element?: ElementId;
   status?: StatusProps[];
   self?: StatusProps[];
 }
 
-export function ResumeEffect({ attack, damage, modifier, element, status, self } : ResumeEffectProps) {
-  const summary = useAppSelector(selectSummary);
-
-  const elementaryAffinity = summary.primaryWeapon?.elementaryAffinity ?? summary.secondaryWeapon?.elementaryAffinity
+export function ResumeEffect({ primaryWeapon, secondaryWeapon, attack, damage, modifier, element, status, self }: ResumeEffectProps) {
+  const elementaryAffinity = primaryWeapon?.elementaryAffinity ?? secondaryWeapon?.elementaryAffinity
   const modifierWithAffinity = (elementaryAffinity && elementaryAffinity === element && {
     attack: addModifier(modifier?.attack ?? 0, 10),
     damage: addModifier(modifier?.damage ?? 0, 2),
   }) || modifier;
+
+  const effectStatus = aggregateStatus(status, modifier?.status);
+  const effectSelf = aggregateStatus(self, modifier?.self);
   return (
     <Bold>
       {attack !== undefined && <AccuracyAttack accuracy={attack + (modifierWithAffinity?.attack ?? 0)} />}
@@ -109,21 +129,21 @@ export function ResumeEffect({ attack, damage, modifier, element, status, self }
         />
       )}
       {damage === undefined && element && <Badge pill><DisplayElement element={element} /></Badge>}
-      {status && (
+      {effectStatus.length > 0 && (
         <Badge pill>
-          {status.map(({ value, status: s }) => (
+          {effectStatus.map(({ value, status: s }) => (
             <span key={s}>
-              <Bold>{value}<DisplayStatus className="mx-1 img-fluid" status={s} /></Bold>
+              <Bold>{value !== 0 ? value : ""}<DisplayStatus className="mx-1 img-fluid" status={s} /></Bold>
             </span>
           ))}
         </Badge>
       )}
-      {self && (
+      {effectSelf.length > 0 && (
         <Badge pill>
           <span className="me-1"><FontAwesomeIcon icon={faUser} /></span>
-          {self.map(({ value, status: s }) => (
+          {effectSelf.map(({ value, status: s }) => (
             <span key={s}>
-              <Bold>{value}<DisplayStatus className="mx-1 img-fluid" status={s} /></Bold>
+              <Bold>{value !== 0 ? value : ""}<DisplayStatus className="mx-1 img-fluid" status={s} /></Bold>
             </span>
           ))}
         </Badge>
@@ -132,11 +152,12 @@ export function ResumeEffect({ attack, damage, modifier, element, status, self }
   )
 }
 
-export function ResumeAttack({ weapon, modifier, element }: Readonly<{ weapon?: LightWeapon, modifier?: WeaponModifier, element?: ElementId }>) {
+export function ResumeAttack({ weapon, modifier, element }: Readonly<{ weapon?: LightWeapon, modifier?: AttackModifier, element?: ElementId }>) {
   const baseDamage = modifier?.baseDamage ?? weapon?.baseDamage ?? 0;
   const criticalBaseDamage = baseDamage * (modifier?.criticalFactor ?? (3 / 2));
   const baseAccuracy = modifier?.baseAccuracy ?? weapon?.baseAccuracy ?? 0;
-  const isWeapon = weapon && (modifier?.forceWeapon || weapon.isWeapon);
+  const isWeapon = weapon && (modifier?.useAsWeapon || weapon.isWeapon);
+  const attackStatus = aggregateStatus(weapon?.status, modifier?.status);
   return (
     <span>
       {isWeapon && (
@@ -149,11 +170,21 @@ export function ResumeAttack({ weapon, modifier, element }: Readonly<{ weapon?: 
             critical={addModifier(Math.floor(criticalBaseDamage) + weapon.damage, modifier?.damage)}
             element={element}
           />
-          {weapon.status && (
+          {attackStatus.length > 0 && (
             <Badge pill>
-              {weapon.status.map(({ value, status }) => (
+              {attackStatus.map(({ value, status }) => (
                 <span key={status}>
-                  <Bold>{value}<DisplayStatus className="mx-1 img-fluid" status={status} /></Bold>
+                  <Bold>{value !== 0 ? value : ""}<DisplayStatus className="mx-1 img-fluid" status={status} /></Bold>
+                </span>
+              ))}
+            </Badge>
+          )}
+          {modifier?.self && (
+            <Badge pill>
+              <span className="me-1"><FontAwesomeIcon icon={faUser} /></span>
+              {modifier.self.map(({ value, status: s }) => (
+                <span key={s}>
+                  <Bold>{value !== 0 ? value : ""}<DisplayStatus className="mx-1 img-fluid" status={s} /></Bold>
                 </span>
               ))}
             </Badge>

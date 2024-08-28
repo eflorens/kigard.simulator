@@ -15,7 +15,7 @@ export const RockSummon: Talent = {
   range: { min: 1, max: 2 },
   resume: (summary) => (
     <span>
-      <ResumeEffect attack={summary.magicAttack} />
+      <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} />
       <Badge pill><StoneGolem /></Badge>
     </span>
   ),

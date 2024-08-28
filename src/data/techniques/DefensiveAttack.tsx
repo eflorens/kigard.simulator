@@ -11,12 +11,12 @@ export const DefensiveAttack: Talent = {
   name: "Attaque défensive",
   usageCost: getPrimaryWeaponUsageCost,
   range: getPrimaryWeaponRange,
-  resume: (summary) => <ResumeAttack weapon={summary?.primaryWeapon} modifier={{ criticalFactor: 1 }} />,
+  resume: (summary) => <ResumeAttack weapon={summary?.primaryWeapon} modifier={{ criticalFactor: 1, self: [{ value: 1, status: Status.Defense }] }} />,
   getDescription: (summary) => (
     <>
       <Row>
         <span>
-          <PrincipalWeaponAttack summary={summary} modifier={{ criticalFactor: 1 }} />
+          <PrincipalWeaponAttack summary={summary} modifier={{ criticalFactor: 1, self: [{ value: 1, status: Status.Defense }] }} />
           <span> et gagne 1<DisplayStatus status={Status.Defense} hasLabel /></span>
         </span>
       </Row>

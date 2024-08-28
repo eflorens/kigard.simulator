@@ -3,6 +3,7 @@ import { Badge } from "./Badge";
 import { Button } from "./Button";
 import { Card, CardBody, CardHeader, CardColumns, CardGroup, CardSubtitle, CardTitle } from "./Card";
 import { Container, Row, Col } from "./Container";
+import { DisplayModificator } from "./DisplayModificator";
 import { CrystalGuardian, Ghost, Ghoul, IceElemental, Skeleton, StoneGolem, Treant } from "./DisplayMonsterImage";
 import { DropdownList } from "./DropdownList";
 import { Input } from "./Input";
@@ -31,6 +32,7 @@ export {
     Row,
     Col,
     DropdownList,
+    DisplayModificator,
     Treant,
     StoneGolem,
     IceElemental,

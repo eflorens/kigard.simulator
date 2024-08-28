@@ -1,8 +1,7 @@
 import { TechniqueId } from "./TechniqueId";
-import { Badge, Bold } from "../../components";
-import { DisplayStatus } from "../../components/DisplayStatus";
 import { Status } from "../inventory";
-import { Talent } from "../talents";
+import { ResumeEffect, Talent } from "../talents";
+import { DisplaySupport } from "../../features/talents/DisplaySupport";
 
 export const MagicOverload: Talent = {
   id: TechniqueId.MagicOverload,
@@ -10,10 +9,6 @@ export const MagicOverload: Talent = {
   usageCost: 0,
   manaCost: 3,
   area: "Soi-même",
-  resume: (summary) => <Badge pill><Bold>+ {summary.intelligence / 5} <DisplayStatus status={Status.Overload} /></Bold></Badge>,
-  getDescription: (summary) => (
-    <span>
-      <span>Confère <Bold>{summary.intelligence / 5} <DisplayStatus status={Status.Overload} hasLabel /></Bold></span>
-    </span>
-  ),
+  resume: (summary) => <ResumeEffect status={[{ value: summary.intelligence / 5, status: Status.Overload }]} />,
+  getDescription: (summary) => <DisplaySupport status={[{ value: summary.intelligence / 5, status: Status.Overload }]} />,
 };

@@ -10,7 +10,7 @@ export const Necrosis: Talent = {
   manaCost: true,
   usageCost: 4,
   range: { min: 0, max: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Necrosis }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: getMagicPower(summary) / 5, status: Status.Necrosis }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       status={[{ value: getMagicPower(summary) / 5, status: Status.Necrosis }]} />),

@@ -12,7 +12,7 @@ export const Thunder: Talent = {
   usageCost: 6,
   range: { min: 1, max: 3 },
   area: { x: 3, y: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Thunder} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Thunder} />,
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (

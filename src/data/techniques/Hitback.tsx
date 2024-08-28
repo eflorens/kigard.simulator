@@ -1,6 +1,6 @@
 import { PrincipalWeaponAttack } from "../PrimaryWeapon";
 import { TechniqueId } from "./TechniqueId";
-import { Badge, Bold, Row } from "../../components";
+import { Bold, Row } from "../../components";
 import { DisplayStatus } from "../../components/DisplayStatus";
 import { Status } from "../inventory";
 import { Talent } from "../talents";
@@ -11,7 +11,7 @@ export const Hitback: Talent = {
   usageCost: 2,
   area: "Soi-même",
   required: "Arme de corps-à-corps",
-  resume: () => <Badge pill><Bold><DisplayStatus status={Status.Hitback} /></Bold></Badge>,
+  resume: (summary) => <PrincipalWeaponAttack summary={summary} modifier={{ status: [{ value: 1, status: Status.Hitback }] }} />,
   getDescription: (summary) => (
     <>
       <Row>

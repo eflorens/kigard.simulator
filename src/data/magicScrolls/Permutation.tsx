@@ -9,7 +9,7 @@ export const Permutation: Talent = {
   manaCost: true,
   usageCost: "(distance x 3)",
   range: { min: 1, max: 2 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} />,
   getDescription: () => (
     <>
       <Row><Col>Echange sa position avec celle de la cible.</Col></Row>

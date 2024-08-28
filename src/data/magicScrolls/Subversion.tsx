@@ -15,7 +15,7 @@ export const Subversion: Talent = {
   resume: (summary) => {
     const value = getMagicPower(summary) / 10;
     return (
-      <ResumeEffect
+      <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon}
         attack={summary.magicAttack}
         status={[{ value, status: Status.Terror }]}
         self={[{ value, status: Status.Will }]} />

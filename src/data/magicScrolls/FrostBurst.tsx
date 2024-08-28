@@ -11,7 +11,7 @@ export const FrostBurst: Talent = {
   usageCost: 4,
   reusable: true,
   range: { min: 1, max: 3 },
-  resume: (summary) => <ResumeEffect attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Ice} status={[{ value: 2, status: Status.Freeze }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} damage={summary.intelligence} modifier={{ damage: summary.magicPower }} element={ElementId.Ice} status={[{ value: 2, status: Status.Freeze }]} />,
   getDescription: (summary) => (
     <DisplayAttack
       element={ElementId.Ice}
