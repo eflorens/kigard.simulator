@@ -1100,6 +1100,7 @@ const twoHands: Weapon[] = [{
   id: 98,
   name: 'Arquebuse en bois',
   weight: 3,
+  doubleSetting: true,
   enhancedEnchantment: true,
   usageCost: 5,
   range: { min: 2, max: 3 },
