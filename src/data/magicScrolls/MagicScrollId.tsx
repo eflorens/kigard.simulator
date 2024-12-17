@@ -39,5 +39,7 @@ export enum MagicScrollId {
   SoulsAwakening = 37,
   FleshAwakening = 38,
   BonesAwakening = 39,
-  Teleportation = 40
+  Teleportation = 40,
+  MentalShock = 41,
+  Electrocution = 42,
 }

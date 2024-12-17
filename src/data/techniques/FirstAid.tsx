@@ -6,7 +6,7 @@ import { Talent, AccuracyAttack, HealStatus } from "../talents";
 
 export const FirstAid: Talent = {
   id: TechniqueId.FirstAid,
-  name: "Premier soin",
+  name: "Premiers soins",
   usageCost: 2,
   range: { min: 0, max: 1 },
   resume: (summary) => (

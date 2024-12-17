@@ -24,7 +24,7 @@ export enum BoxType {
 export type AreaType = BoxType | {
   x: number;
   y: number;
-} | "Arc de 3" | "Soi-même";
+} | "Arc de 3" | "Soi-même" | "Cible alliée";
 
 export type Range = { min: number, max: number } | "Portée Arme" | "Portée Arme + 1";
 

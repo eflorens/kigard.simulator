@@ -45,5 +45,11 @@ export enum TechniqueId {
   Ambush = 42,
   CombatMagic = 43,
   BeastMastery = 44,
-  Vigilance = 45
+  Vigilance = 45,
+  SteadfastDefense = 46,
+  ApplyPotion = 47,
+  TendWounds = 48,
+  Taunt = 49,
+  ProvokingStrike = 50,
+  ExplosiveStrike = 51
 }

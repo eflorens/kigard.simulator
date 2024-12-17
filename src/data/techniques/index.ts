@@ -44,6 +44,12 @@ import { CombatMagic } from "./CombatMagic";
 import { BeastMastery } from "./BeastMastery";
 import { Vigilance } from "./Vigilance";
 import { IncisiveAttack } from "./IncisiveAttack";
+import { SteadfastDefense } from "./SteadfastDefense";
+import { ApplyPotion } from "./ApplyPotion";
+import { TendWounds } from "./TendWounds";
+import { Taunt } from "./Taunt";
+import { ProvokingStrike } from "./ProvokingStrike";
+import { ExplosiveStrike } from "./ExplosiveStrike";
 
 
 export const allTechniques: Talent[] = [Stun, DefensiveAttack, HypnoticAttack, IncisiveAttack, MysticAttack,
@@ -51,5 +57,6 @@ export const allTechniques: Talent[] = [Stun, DefensiveAttack, HypnoticAttack, I
   ChainAttack, ProjectileLaunch, Devastate, Siphon, LongRangeShot, Torment, AthleticLeap, SuddenDisappearance,
   IgniteArrow, Incant, Inspire, FutureRead, DefensiveMeditation, BloodSacrifice, SetTrap, FirstAid,
   IntuitiveSearch, StimulatingTreatment, DevotedSupport, MysticalSubterfuge, MagicOverload, Protect,
-  Retirement, Hitback, Ambidexterity, Cavalry, Ambush, CombatMagic, BeastMastery, Vigilance,
+  Retirement, Hitback, Ambidexterity, Cavalry, Ambush, CombatMagic, BeastMastery, Vigilance, SteadfastDefense,
+  ApplyPotion, TendWounds, Taunt, ProvokingStrike, ExplosiveStrike
 ];

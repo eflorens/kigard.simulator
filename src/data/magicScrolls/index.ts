@@ -10,6 +10,7 @@ import { CrystalSummon } from "./CrystalSummon";
 import { CrystalWall } from "./CrystalWall";
 import { Devotion } from "./Devotion";
 import { Discipline } from "./Discipline";
+import { Electrocution } from "./Electrocution";
 import { Exaltation } from "./Exaltation";
 import { FireBall } from "./FireBall";
 import { FleshAwakening } from "./FleshAwakening";
@@ -24,6 +25,7 @@ import { Invisibility } from "./Invisibility";
 import { Judgement } from "./Judgement";
 import { LifeDrain } from "./LifeDrain";
 import { MagicStealing } from "./MagicStealing";
+import { MentalShock } from "./MentalShock";
 import { Necrosis } from "./Necrosis";
 import { Permutation } from "./Permutation";
 import { Poisoning } from "./Poisoning";
@@ -43,4 +45,5 @@ export const allMagicScrolls = [FireBall, Freezing, LifeDrain, Restraining, Bewi
   Incineration, Judgement, CrystalSpear, Poisoning, Bleeding, Necrosis, Permutation, Stinging, FrostBurst, Subversion, Telekinesis,
   MagicStealing, Armor, Devotion, Discipline, Aegis, Exaltation, Healing, Instinct, Invisibility, Purification,
   Reflex, Regeneration, CrystalWall, BramblesWall, ForestSummon, RockSummon, CrystalSummon, FrostSummon,
-  SoulsAwakening, FleshAwakening, BonesAwakening, Teleportation,];
+  SoulsAwakening, FleshAwakening, BonesAwakening, Teleportation, MentalShock, Electrocution
+];
