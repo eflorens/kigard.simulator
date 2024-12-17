@@ -6,7 +6,7 @@ export enum Status {
   Piercing = 3,
   Poisoned = 4,
   Inspiration = 5,
-  Overload = 6,
+  Overload = 29,
   Force = 8,
   Necrosis = 9,
   Defense = 10,
@@ -31,6 +31,7 @@ export enum Status {
   Freeze = 39,
   Will = 40,
   Fire = 44,
+  Taunt = 47,
 }
 
 export const allStatus = [{
@@ -123,6 +124,9 @@ export const allStatus = [{
 }, {
   id: Status.Fire,
   name: "Incendie"
+}, {
+  id: Status.Taunt,
+  name: 'Provocation'
 }];
 
 export enum ElementId {
