@@ -404,6 +404,7 @@
             "name": "Torche",
             "weight": 2,
             "damage": 1,
+            "observation": 10,
             "status": [
                 {
                     "value": 1,
@@ -1274,6 +1275,12 @@
             "weight": 2,
             "armor": 2,
             "dodge": 10
+        },
+        {
+            "id": 104,
+            "name": "Lanterne",
+            "observation": 15,
+            "weight": 1
         },
         {
             "id": 256,
