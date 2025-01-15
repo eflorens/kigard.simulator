@@ -9,7 +9,6 @@ import { MagicScrollId } from "./MagicScrollId";
 export const MagicStealing: Talent = {
   id: MagicScrollId.MagicStealing,
   name: "Vol de magie",
-  manaCost: true,
   usageCost: 4,
   range: { min: 1, max: 3 },
   resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} />,
