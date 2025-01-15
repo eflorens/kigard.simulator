@@ -216,7 +216,7 @@
             "name": "Pèlerine",
             "weight": 2,
             "dodge": 10,
-            "magicResistance": 10,
+            "magicDefense": 10,
             "discretion": 10
         },
         {
@@ -419,6 +419,19 @@
             "weight": 1,
             "damage": 4,
             "usageCost": 4
+        },
+        {
+            "id": 316,
+            "name": "Epée de cauchemar",
+            "weight": 2,
+            "damage": 3,
+            "usageCost": 4,
+            "status": [
+                {
+                    "value": 1,
+                    "status": "Terror"
+                }
+            ]
         },
         {
             "id": 114,
