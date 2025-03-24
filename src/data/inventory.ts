@@ -28,6 +28,7 @@ export enum Status {
   Exalted = 30,
   Bewitched = 31,
   Exposed = 32,
+  AccuracyPenalty = 38,
   Freeze = 39,
   Will = 40,
   Fire = 44,
@@ -127,6 +128,9 @@ export const allStatus = [{
 }, {
   id: Status.Taunt,
   name: 'Provocation'
+}, {
+  id: Status.AccuracyPenalty,
+  name: 'Malus de Précision'
 }];
 
 export enum ElementId {
