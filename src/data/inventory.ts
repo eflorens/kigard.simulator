@@ -367,19 +367,17 @@ const getWeapon = (weapon: WeaponData): Weapon => ({
   elementaryAffinity: weapon.elementaryAffinity ? ElementId[weapon.elementaryAffinity as keyof typeof ElementId] : undefined,
 });
 
-const head: Item[] = (inventoryData.head as ItemData[]).map(getItem);
+const sortItemsByName = (items: Item[]) => {
+  return items.sort((a, b) => a.name.localeCompare(b.name));
+}
 
-const bust: Item[] = inventoryData.bust.map(getItem);
+const head = sortItemsByName((inventoryData.head as ItemData[]).map(getItem));
+const bust = sortItemsByName(inventoryData.bust.map(getItem));
+const oneHandWeapon = inventoryData.oneHandWeapon.map(getWeapon);
+const twoHands = inventoryData.twoHands.map(getWeapon);
+const oneHand = inventoryData.oneHand.map(getItem);
+const feet = sortItemsByName(inventoryData.feet.map(getItem));
+const fetish = sortItemsByName(inventoryData.fetish.map(getItem));
+const hand = [...oneHandWeapon, ...oneHand];
 
-const oneHandWeapon: Weapon[] = inventoryData.oneHandWeapon.map(getWeapon);
-
-const twoHands: Weapon[] = inventoryData.twoHands.map(getWeapon);
-
-const oneHand: Item[] = inventoryData.oneHand.map(getItem);
-
-const feet: Item[] = inventoryData.feet.map(getItem);
-
-const fetish: Item[] = inventoryData.fetish.map(getItem);
-
-const hand: (Item | Weapon)[] = [...oneHandWeapon, ...oneHand];
 export { head, bust, hand, twoHands, feet, fetish };
