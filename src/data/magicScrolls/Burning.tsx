@@ -25,7 +25,7 @@ export const Burning: Talent = {
           <Col><Bold>Sur décor d'arbre ou d'herbe</Bold> : Devient <Bold>un <DisplayStatus status={Status.Fire} hasLabel /></Bold> de <Bold>{mag / 5} <DisplayStatus status={Status.Fire} /></Bold> intensité.</Col>
         </Row>
         <Row>
-          <Col><Bold>Sur personnage</Bold> : <DisplayAttack status={[{ value: 2, status: Status.Burning, }]} />.</Col>
+          <Col><Bold>Sur personnage</Bold> : Inflige <Bold>{mag / 5} <DisplayStatus status={Status.Burning} hasLabel /></Bold>.</Col>
         </Row>
       </>
     );
