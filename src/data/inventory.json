@@ -1773,6 +1773,13 @@
             "dodge": 5
         },
         {
+            "id": 447,
+            "name": "Bracelet des étoiles",
+            "weight": 1,
+            "magicAttack": 5,
+            "magicDefense": 5
+        },
+        {
             "id": 216,
             "name": "Boucle en or",
             "weight": 1,
