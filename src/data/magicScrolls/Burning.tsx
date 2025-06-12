@@ -1,6 +1,5 @@
 import { Row, Col, Bold } from "../../components";
 import { DisplayStatus } from "../../components/DisplayStatus";
-import { DisplayAttack } from "../../features/talents/DisplayAttack";
 import { Status } from "../inventory";
 import { getMagicPower } from "../talents";
 import { Talent, ResumeEffect } from "../talents";
