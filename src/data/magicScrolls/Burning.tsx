@@ -12,7 +12,7 @@ export const Burning: Talent = {
   usageCost: 6,
   range: { min: 1, max: 3 },
   area: { x: 3, y: 3 },
-  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value: 2, status: Status.Burning }, { value: getMagicPower(summary) / 5, status: Status.Fire }]} />,
+  resume: (summary) => <ResumeEffect primaryWeapon={summary.primaryWeapon} secondaryWeapon={summary.secondaryWeapon} attack={summary.magicAttack} status={[{ value:  getMagicPower(summary) / 5, status: Status.Burning }, { value: getMagicPower(summary) / 5, status: Status.Fire }]} />,
   getDescription: (summary) => {
     const mag = getMagicPower(summary);
     return (
