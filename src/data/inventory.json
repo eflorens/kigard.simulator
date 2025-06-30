@@ -218,6 +218,13 @@
             "armor": 4
         },
         {
+            "id": 193,
+            "name": "Plastron dragon",
+            "weight": 3,
+            "armor": 6,
+            "magicAttack": 10
+        },
+        {
             "id": 48,
             "name": "Armure en cuir",
             "weight": 2,
