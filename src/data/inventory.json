@@ -1073,8 +1073,6 @@
             "weight": 5,
             "damage": 2,
             "usageCost": 4,
-            "doubleSetting": true,
-            "enhancedEnchantment": true,
             "actionPointsBonus": 100
         }
     ],
@@ -1375,6 +1373,8 @@
             "id": 454,
             "name": "Bâton de sorcier",
             "weight": 2,
+            "doubleSetting": true,
+            "enhancedEnchantment": true,
             "usageCost": 4,
             "damage": 0,
             "magicPower": 7
@@ -1383,6 +1383,8 @@
             "id": 455,
             "name": "Bâton d'hérétique",
             "weight": 2,
+            "doubleSetting": true,
+            "enhancedEnchantment": true,
             "usageCost": 4,
             "damage": 0,
             "magicPower": 9
